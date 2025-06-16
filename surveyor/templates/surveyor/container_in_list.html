@@ -1,0 +1,62 @@
+    {% extends 'base_surveyor.html' %}
+
+    {% block title %}List Container Masuk{% endblock %}
+
+    {% block content %}
+    <div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4 px-3">
+            <h1 class="h3 mb-0 text-dark">Daftar Container Masuk</h1>
+            <a href="{% url 'surveyor:dashboard' %}" class="btn btn-secondary">← Kembali</a>
+        </div>
+
+        <!-- DataTable -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong class="card-title">Data Container</strong>
+                </div>
+                <div class="card-body">
+                    <table id="bootstrap-data-table" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Container No</th>
+                                <th>Type</th>
+                                <th>Size</th>
+                                <th>Condition</th>
+                                <th>Grade</th>
+                                <th>Act In</th>
+                                <th>Created At</th>
+                                <th>Photo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in containers %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ c.container_no }}</td>
+                                <td>{{ c.container_type }}</td>
+                                <td>{{ c.size }}</td>
+                                <td>{{ c.condition }}</td>
+                                <td>{{ c.grade }}</td>
+                                <td>{{ c.act_in }}</td>
+                                <td>{{ c.created_at|date:"Y-m-d H:i" }}</td>
+                                <td>
+                                    <a href="{% url 'surveyor:container_photos' c.referal c.container_no %}" class="btn btn-sm btn-info" title="Lihat Foto">
+                                        <i class="fa fa-search"></i>
+                                    </a>                                    
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="14" class="text-center">Belum ada data container.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

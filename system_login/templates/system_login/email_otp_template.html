@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reset Password - Intercon</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            padding: 0;
+            margin: 0;
+        }
+        .email-wrapper {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .email-header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .email-body {
+            padding: 30px;
+        }
+        .otp-code {
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 5px;
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .email-footer {
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-header">
+            <h2>Reset Password</h2>
+        </div>
+        <div class="email-body">
+            <p>Halo,</p>
+            <p>Kami menerima permintaan untuk mereset password akun Anda yang terdaftar dengan email <strong>{{ email }}</strong>.</p>
+            <p>Gunakan kode OTP berikut untuk melanjutkan proses reset password Anda:</p>
+            <div class="otp-code">{{ otp }}</div>
+            <p>Kode ini hanya berlaku dalam beberapa menit. Jika Anda tidak merasa melakukan permintaan ini, silakan abaikan email ini.</p>
+            <p>Terima kasih,<br>Tim Intercon</p>
+        </div>
+        <div class="email-footer">
+            &copy; {{ now|date:"Y" }} Intercon. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

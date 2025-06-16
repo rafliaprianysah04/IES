@@ -1,0 +1,113 @@
+{% extends 'base_surveyor.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    .menu-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: none;
+        color: white;
+    }
+
+    .menu-card:hover {
+        transform: translateY(-5px) scale(1.03);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .bg-menu {
+        background-color: #007bff;
+    }
+
+    /* Custom 5-column layout */
+    @media (min-width: 992px) {
+        .col-lg-custom {
+            flex: 0 0 20%;
+            max-width: 20%;
+        }
+    }
+
+    /* Square cards */
+    .square-card {
+        aspect-ratio: 1 / 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem;
+    }
+
+    .square-card i {
+        font-size: 3rem;
+    }
+
+    .square-card h6 {
+        margin-top: 1rem;
+        font-size: 1rem;
+    }
+</style>
+
+<div class="container mt-4">
+    <h3 class="mb-4">Dashboard Surveyor</h3>
+
+    <div class="row">
+        <!-- Survey Container -->
+        <div class="col-6 col-md-4 col-lg-custom mb-4">
+            <a href="{% url 'surveyor:container_in' %}" class="text-decoration-none">
+                <div class="card menu-card bg-menu text-center square-card">
+                    <div>
+                        <i class="fas fa-plus mb-2"></i>
+                        <h6>Survey Container</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Rooftop Photo -->
+        <div class="col-6 col-md-4 col-lg-custom mb-4">
+            <a href="{% url 'surveyor:upload_rooftop' %}" class="text-decoration-none">
+                <div class="card menu-card bg-menu text-center square-card">
+                    <div>
+                        <i class="fas fa-camera mb-2"></i>
+                        <h6>Rooftop Photo</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Under Photo -->
+        <div class="col-6 col-md-4 col-lg-custom mb-4">
+            <a href="{% url 'surveyor:upload_under' %}" class="text-decoration-none">
+                <div class="card menu-card bg-menu text-center square-card">
+                    <div>
+                        <i class="fas fa-eye mb-2"></i>
+                        <h6>Under Photo</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Shifting -->
+        <div class="col-6 col-md-4 col-lg-custom mb-4">
+            <a href="{% url 'surveyor:shifting' %}" class="text-decoration-none">
+                <div class="card menu-card bg-menu text-center square-card">
+                    <div>
+                        <i class="fas fa-dolly-flatbed mb-2"></i>
+                        <h6>Shifting</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Daftar Container -->
+        <div class="col-6 col-md-4 col-lg-custom mb-4">
+            <a href="{% url 'surveyor:container_in_list' %}" class="text-decoration-none">
+                <div class="card menu-card bg-menu text-center square-card">
+                    <div>
+                        <i class="fas fa-list mb-2"></i>
+                        <h6>Daftar Container</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

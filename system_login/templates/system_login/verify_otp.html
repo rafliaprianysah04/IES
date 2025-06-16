@@ -1,0 +1,22 @@
+{% extends 'base_login.html' %}
+{% block title %}Verifikasi OTP{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm mt-5">
+            <div class="card-body">
+                <h4 class="text-center mb-4">Verifikasi OTP</h4>
+                <form method="post" action="{% url 'login_sistem:verify_otp' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="otp" class="form-label">Masukkan Kode OTP</label>
+                        <input type="text" class="form-control" name="otp" placeholder="XXXXX" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Verifikasi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

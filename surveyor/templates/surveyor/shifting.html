@@ -1,0 +1,215 @@
+{% extends 'base_surveyor.html' %}
+{% load static %}
+{% block title %}Penempatan Container{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 px-3">
+        <h1 class="h3 mb-0 text-dark">Penempatan Container</h1>
+        <a href="{% url 'surveyor:dashboard' %}" class="btn btn-secondary">← Kembali</a>
+    </div>
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Form Penempatan</strong>
+            </div>
+            <div class="card-body card-block">
+                <form id="placementForm" method="POST">
+                    {% csrf_token %}
+
+                    <!-- Input No Container -->
+                    <div class="form-group">
+                        <label for="container_no" class="form-control-label">No Container</label>
+                        <input type="text" id="container_no" name="container_no" class="form-control" placeholder="Contoh: ABCD1234567" autocomplete="off">
+                        <small id="status_check" class="form-text text-muted"></small>
+                    </div>
+
+                    <!-- Block, Spec, Row, Tier -->
+                    <div class="form-row">
+                        <!-- Block -->
+                        <div class="form-group col-md-3">
+                            <label for="block" class="form-control-label">Block</label>
+                            <select id="block" name="block" class="form-control">
+                                <option value="">-- Pilih Block --</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                                <option value="E">E</option>
+                                <option value="F">F</option>
+                                <option value="W">W</option>
+                                <option value="X">X</option>
+                                <option value="Z">Z</option>
+                            </select>
+                        </div>
+
+                        <!-- Spec -->
+                        <div class="form-group col-md-3">
+                            <label for="spec" class="form-control-label">Spec</label>
+                            <select id="spec" name="spec" class="form-control">
+                                <option value="">-- Pilih Spec --</option>
+                                {% comment %} Spesifikasi 01 s/d 15 {% endcomment %}
+                                <option value="01">01</option>
+                                <option value="02">02</option>
+                                <option value="03">03</option>
+                                <option value="04">04</option>
+                                <option value="05">05</option>
+                                <option value="06">06</option>
+                                <option value="07">07</option>
+                                <option value="08">08</option>
+                                <option value="09">09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                            </select>
+                        </div>
+
+                        <!-- Row -->
+                        <div class="form-group col-md-3">
+                            <label for="row" class="form-control-label">Row</label>
+                            <select id="row" name="row" class="form-control">
+                                <option value="">-- Pilih Row --</option>
+                                <option value="01">01</option>
+                                <option value="02">02</option>
+                                <option value="03">03</option>
+                                <option value="04">04</option>
+                                <option value="05">05</option>
+                                <option value="06">06</option>
+                                <option value="07">07</option>
+                                <option value="08">08</option>
+                                <option value="09">09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                            </select>
+                        </div>
+
+                        <!-- Tier -->
+                        <div class="form-group col-md-3">
+                            <label for="tier" class="form-control-label">Tier</label>
+                            <select id="tier" name="tier" class="form-control">
+                                <option value="">-- Pilih Tier --</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btnSubmit" class="btn btn-primary">Simpan Penempatan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById('placementForm');
+    const containerInput = document.getElementById('container_no');
+    const statusSpan = document.getElementById('status_check');
+    const btnSubmit = document.getElementById('btnSubmit');
+
+    statusSpan.style.display = 'none';
+    btnSubmit.disabled = true;
+
+    function validateContainerNo() {
+        const containerNo = containerInput.value.trim();
+        const containerFormat = /^[A-Z]{4}\d{7}$/;
+
+        if (!containerNo || !containerFormat.test(containerNo)) {
+            statusSpan.textContent = '❌ Format salah (contoh: ABCD1234567)';
+            statusSpan.style.color = 'red';
+            statusSpan.style.display = 'block';
+            btnSubmit.disabled = true;
+            return;
+        }
+
+        fetch(`{% url 'surveyor:cek_valid_container' %}?container_no=${containerNo}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    statusSpan.textContent = '✅ Nomor container valid';
+                    statusSpan.style.color = 'green';
+                    btnSubmit.disabled = false;
+                } else {
+                    statusSpan.textContent = '❌ Nomor container tidak terdaftar';
+                    statusSpan.style.color = 'red';
+                    btnSubmit.disabled = true;
+                }
+                statusSpan.style.display = 'block';
+            })
+            .catch(error => {
+                statusSpan.textContent = '❌ Terjadi kesalahan saat mengecek';
+                statusSpan.style.color = 'red';
+                statusSpan.style.display = 'block';
+                btnSubmit.disabled = true;
+            });
+    }
+
+    containerInput.addEventListener('blur', validateContainerNo);
+    containerInput.addEventListener('keyup', function () {
+        statusSpan.style.display = 'none';
+        btnSubmit.disabled = true;
+    });
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const containerNo = containerInput.value.trim();
+        const block = document.getElementById('block').value.trim();
+        const spec = document.getElementById('spec').value.trim();
+        const row = document.getElementById('row').value.trim();
+        const tier = document.getElementById('tier').value.trim();
+
+        const containerFormat = /^[A-Z]{4}\d{7}$/;
+
+        if (!containerNo || !containerFormat.test(containerNo)) {
+            Swal.fire('Error', 'Nomor container tidak valid. Format: ABCD1234567', 'error');
+            return;
+        }
+
+        if (!block || !spec || !row || !tier) {
+            Swal.fire('Error', 'Semua kolom penempatan wajib diisi.', 'error');
+            return;
+        }
+
+        const formData = new FormData(form);
+
+        fetch("{% url 'surveyor:simpan_penempatan_container' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                Swal.fire('Berhasil!', 'Penempatan container berhasil disimpan.', 'success');
+                form.reset();
+                statusSpan.style.display = 'none';
+                btnSubmit.disabled = true;
+            } else {
+                Swal.fire('Gagal!', data.message || 'Terjadi kesalahan.', 'error');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            Swal.fire('Oops!', 'Gagal mengirim data ke server.', 'error');
+        });
+    });
+});
+    </script>
+{% endblock %}

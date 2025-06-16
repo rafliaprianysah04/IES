@@ -1,0 +1,426 @@
+{% extends 'base_surveyor.html' %}
+{% load static %}
+{% block title %}Container-In{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 px-3">
+        <h1 class="h3 mb-0 text-dark">Input Container</h1>
+        <a href="{% url 'surveyor:dashboard' %}" class="btn btn-secondary">← Kembali</a>
+    </div>    
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Form Container-In</strong>
+            </div>
+            <div class="card-body card-block">
+                <form id="containerForm" method="POST" action="{% url 'surveyor:container_in' %}">
+                    {% csrf_token %}
+
+                    <!-- No Container -->
+                    <div class="form-group">
+                        <label for="container_no" class="form-control-label">No Container</label>
+                        <input type="text" id="container_no" name="container_no" class="form-control" placeholder="Contoh: ABCD123456" autocomplete="off">
+                        <small id="status_check" class="form-text text-muted"></small>
+                    </div>
+
+                    <!-- Customer Code -->
+                    <div class="form-group">
+                        <label for="customer_code" class="form-control-label">Customer Code</label>
+                        <select id="customer_code" name="customer_code" class="form-control">
+                            <option value="">-- Pilih Customer --</option>
+                            <option value="MSL">MSL</option>
+                            <option value="OCL">OCL</option>
+                            <option value="BSS">BSS</option>
+                        </select>
+                    </div>
+
+                    <!-- Inline: Container Type, Size, Condition -->
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Tipe</label>
+                        <div class="col-sm-3">
+                            <select name="container_type" class="form-control">
+                                <option value="">--</option>
+                                <option value="GP">GP</option>
+                                <option value="HU">HU</option>
+                                <option value="RF">RF</option>
+                                <option value="RH">RH</option>
+                                <option value="OT">OT</option>
+                                <option value="FT">FT</option>
+                                <option value="HR">HR</option>
+                                <option value="TK">TK</option>
+                            </select>
+                        </div>
+
+                        <label class="col-sm-1 col-form-label">Size</label>
+                        <div class="col-sm-2">
+                            <select name="size" class="form-control">
+                                <option value="">--</option>
+                                <option value="20">20</option>
+                                <option value="40">40</option>
+                                <option value="45">45</option>
+                            </select>
+                        </div>
+
+                        <label class="col-sm-2 col-form-label">Kondisi</label>
+                        <div class="col-sm-2">
+                            <select name="condition" class="form-control">
+                                <option value="">--</option>
+                                <option value="AV">Good (AV)</option>
+                                <option value="DM">Damaged (DM)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Inline: Washing, Grade, Act In -->
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Washing</label>
+                        <div class="col-sm-3">
+                            <select name="washing" class="form-control">
+                                <option value="">--</option>
+                                <option value="W">Water (W)</option>
+                                <option value="D">Detergen (D)</option>
+                                <option value="C">Chemical (C)</option>
+                            </select>
+                        </div>
+
+                        <label class="col-sm-1 col-form-label">Grade</label>
+                        <div class="col-sm-2">
+                            <select name="grade" class="form-control">
+                                <option value="">--</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="K">K</option>
+                                <option value="E">E</option>
+                                <option value="Q">Q</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                            </select>
+                        </div>
+
+                        <label class="col-sm-2 col-form-label">Act In</label>
+                        <div class="col-sm-2">
+                            <select name="act_in" class="form-control">
+                                <option value="">--</option>
+                                <option value="IM">IM</option>
+                                <option value="OB">OB</option>
+                                <option value="ON">ON</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Manufacture Date -->
+                    <div class="form-group">
+                        <label for="manufacture" class="form-control-label">Manufacture</label>
+                        <input type="month" id="manufacture" name="manufacture" class="form-control">
+                    </div>
+
+                    <!-- Inline: Tare & Payload -->
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Tare</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="tare" class="form-control" placeholder="Contoh: 2300">
+                        </div>
+
+                        <label class="col-sm-2 col-form-label">Payload</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="payload" class="form-control" placeholder="Contoh: 28000">
+                        </div>
+                    </div>
+
+                    <!-- Inline: Haulier Name & Truck No -->
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Haulier Name</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="haulier" class="form-control" placeholder="Contoh: 2300">
+                        </div>
+
+                        <label class="col-sm-2 col-form-label">Truck No</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="truck" class="form-control" placeholder="Contoh: 28000">
+                        </div>
+                    </div>
+
+                    <!-- Washing By -->
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Washing By</label>
+                        <div class="col-sm-10">
+                            <select name="washing_by" class="form-control">
+                                <option value="">-- Pilih Petugas --</option>
+                                <option value="Andi">Andi</option>
+                                <option value="Budi">Budi</option>
+                                <option value="Citra">Citra</option>
+                                <option value="Dewi">Dewi</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Remark -->
+                    <div class="form-group">
+                        <label for="remark" class="form-control-label">Remark</label>
+                        <textarea id="remark" name="remark" class="form-control" rows="3" placeholder="Masukkan keterangan tambahan (opsional)..."></textarea>
+                    </div>
+
+                    <!-- Upload Foto Container -->
+                    <div class="form-group">
+                        <label class="form-control-label">Upload Foto Container</label>
+                        
+                        <!-- Area Drag & Drop -->
+                        <div id="drop-area-photo" class="border border-secondary text-center p-4" style="cursor: pointer;">
+                            <i class="fa fa-camera fa-3x text-secondary"></i>
+                            <p class="mt-2">Drag & Drop foto di sini atau klik untuk memilih</p>
+                            <input type="file" id="container_photos" name="photos" accept="image/*" hidden multiple>
+                            <div id="photo-preview" class="mt-3 d-flex flex-wrap gap-2"></div>
+                        </div>
+
+                        <!-- Tombol kamera langsung (khusus mobile) -->
+                        <div class="mt-2">
+                            <input type="file" id="camera_capture" accept="image/*" capture="environment" class="form-control-file">
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" id="btnSubmit" disabled>Simpan Data</button>
+                        <button type="button" id="btnScanQR" class="btn btn-secondary text-white">Scan QR</button>
+                        <button type="reset" class="btn btn-danger">Reset</button>
+
+                        <div id="reader" style="width: 100%; max-width: 320px; margin-top: 10px;"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QRCode library -->
+<script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const dropArea = document.getElementById("drop-area-photo");
+        const fileInput = document.getElementById("container_photos");
+        const cameraInput = document.getElementById("camera_capture");
+        const previewArea = document.getElementById("photo-preview");
+        const form = document.getElementById('containerForm');
+        const containerInput = document.getElementById('container_no');
+        const statusSpan = document.getElementById('status_check');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const btnScanQR = document.getElementById('btnScanQR');
+        const qrReader = document.getElementById('reader');
+    
+        // Buffer global untuk file yang dipilih
+        const fileBuffer = new DataTransfer();
+    
+        // === UPLOAD FOTO ===
+        dropArea.addEventListener("click", () => fileInput.click());
+    
+        dropArea.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            dropArea.classList.add("border-primary");
+        });
+    
+        dropArea.addEventListener("dragleave", () => {
+            dropArea.classList.remove("border-primary");
+        });
+    
+        dropArea.addEventListener("drop", (event) => {
+            event.preventDefault();
+            dropArea.classList.remove("border-primary");
+            appendFiles(event.dataTransfer.files);
+        });
+    
+        fileInput.addEventListener("change", () => {
+            appendFiles(fileInput.files);
+        });
+    
+        cameraInput.addEventListener("change", () => {
+            appendFiles(cameraInput.files);
+        });
+    
+        function appendFiles(newFiles) {
+            const existingFiles = Array.from(fileBuffer.files);
+    
+            Array.from(newFiles).forEach(newFile => {
+                const isDuplicate = existingFiles.some(file =>
+                    file.name === newFile.name &&
+                    file.size === newFile.size &&
+                    file.lastModified === newFile.lastModified
+                );
+                if (!isDuplicate) {
+                    fileBuffer.items.add(newFile);
+                }
+            });
+    
+            fileInput.files = fileBuffer.files;
+            showPreview(fileBuffer.files);
+        }
+    
+        function showPreview(files) {
+            previewArea.innerHTML = '';
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith("image/")) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const img = document.createElement("img");
+                        img.src = e.target.result;
+                        img.classList.add("img-thumbnail");
+                        img.style.width = "100px";
+                        img.style.height = "100px";
+                        img.style.marginRight = "5px";
+                        previewArea.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    
+        // === VALIDASI NOMOR CONTAINER ===
+        statusSpan.style.display = 'none';
+        btnSubmit.disabled = true;
+    
+        function validateContainerNo() {
+            const containerNo = containerInput.value.trim();
+            if (containerNo !== '') {
+                fetch(`{% url 'surveyor:cek_valid_container' %}?container_no=${containerNo}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'OK') {
+                            statusSpan.textContent = '✅ OK';
+                            statusSpan.style.color = 'green';
+                            statusSpan.style.display = 'block';
+                            btnSubmit.disabled = false;
+                        } else {
+                            statusSpan.textContent = '❌ Failed';
+                            statusSpan.style.color = 'red';
+                            statusSpan.style.display = 'block';
+                            btnSubmit.disabled = true;
+                        }
+                    });
+            }
+        }
+    
+        containerInput.addEventListener('keydown', function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                validateContainerNo();
+            }
+        });
+    
+        containerInput.addEventListener('blur', validateContainerNo);
+    
+        // === QR CODE SCANNER ===
+        btnScanQR.addEventListener("click", function () {
+            const html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                },
+                (decodedText) => {
+                    containerInput.value = decodedText;
+                    validateContainerNo();
+    
+                    html5QrCode.stop().then(() => {
+                        qrReader.innerHTML = "";
+                    }).catch(err => console.error("Stop error:", err));
+                },
+                (errorMessage) => {
+                    // Silent error
+                }
+            ).catch(err => {
+                console.error("Camera start error:", err);
+            });
+        });
+    
+        // === SUBMIT FORM ===
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(form);
+    
+            fetch("{% url 'surveyor:save_container_ajax' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const qrContainer = document.createElement('div');
+                    qrContainer.id = 'qrcode';
+                    qrContainer.style.display = 'flex';
+                    qrContainer.style.justifyContent = 'center';
+                    qrContainer.style.marginBottom = '15px';
+    
+                    const qrCode = new QRCodeStyling({
+                        width: 250,
+                        height: 250,
+                        data: data.container_no,
+                        image: "{% static 'images/logo.png' %}",
+                        imageOptions: {
+                            crossOrigin: "anonymous",
+                            margin: 8,
+                            imageSize: 0.5
+                        },
+                        dotsOptions: {
+                            color: "#000",
+                            type: "square"
+                        },
+                        backgroundOptions: {
+                            color: "#fff"
+                        }
+                    });
+    
+                    setTimeout(() => {
+                        qrCode.append(qrContainer);
+                    }, 100);
+    
+                    Swal.fire({
+                        title: 'Data Tersimpan!',
+                        html: `<div style="text-align: center;"><p><strong>${data.container_no}</strong></p></div>`,
+                        icon: 'success',
+                        didOpen: () => {
+                            const content = Swal.getHtmlContainer();
+                            content.appendChild(qrContainer);
+    
+                            const downloadBtn = document.createElement('button');
+                            downloadBtn.textContent = 'Simpan QR';
+                            downloadBtn.className = 'swal2-confirm swal2-styled';
+                            downloadBtn.style.backgroundColor = '#6c757d';
+                            downloadBtn.style.marginRight = '10px';
+                            downloadBtn.style.color = '#fff';
+                            downloadBtn.onclick = () => {
+                                qrCode.download({ name: `${data.container_no}_QR`, extension: "png" });
+                            };
+    
+                            const confirmBtn = Swal.getConfirmButton();
+                            confirmBtn.parentNode.insertBefore(downloadBtn, confirmBtn);
+                        }
+                    });
+    
+                    form.reset();
+                    fileBuffer.clearData();
+                    fileInput.files = fileBuffer.files;
+                    cameraInput.value = '';
+                    previewArea.innerHTML = '';
+                    btnSubmit.disabled = true;
+                    statusSpan.style.display = 'none';
+    
+                } else {
+                    Swal.fire('Gagal!', data.message || 'Terjadi kesalahan.', 'error');
+                }
+            })
+            .catch(err => {
+                Swal.fire('Oops!', 'Terjadi error saat mengirim data.', 'error');
+                console.error(err);
+            });
+        });
+    });
+</script>
+    
+{% endblock %}

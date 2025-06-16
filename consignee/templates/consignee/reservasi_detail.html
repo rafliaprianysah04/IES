@@ -1,0 +1,162 @@
+{% extends 'base_consignee.html' %}
+
+{% block title %}Detail Reservasi{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <style>
+        /* CSS untuk tampilan Nota */
+        .nota {
+            width: 80%;
+            margin: 0 auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+        .nota-header {
+            margin-bottom: 20px;
+        }
+
+        .nota-header p {
+            font-size: 16px;
+            margin: 8px 0;
+        }
+
+        .nota-header p strong {
+            font-weight: bold;
+        }
+
+        .nota-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .nota-table th, .nota-table td {
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+            border: 1px solid #ddd;
+        }
+
+        .nota-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .nota-table tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+
+        .nota-table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Styling untuk badge */
+        .badge.bg-secondary {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: #e0e0e0;
+        }
+
+        /* Tombol Kembali */
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+
+        /* Sesuaikan padding dan margin di dalam card */
+        .card {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        /* Membuat layout dua kolom */
+        .row-detail {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 200px;
+        }
+
+        .col-detail {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .col-detail p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        .col-detail strong {
+            font-weight: bold;
+        }
+    </style>
+
+    <div class="col-md-12">
+        <div class="card">
+            <h1 class="h4 mb-4 mt-3 text-dark text-center">Detail Reservasi</h1>
+            
+            <div class="nota-header">
+                <div class="row-detail">
+                    <div class="col-detail">
+                        <p><strong>Reservasi ID:</strong> {{ reservasi_list.0.reservasi_id }}</p>
+                        <p><strong>Consignee:</strong> {{ reservasi_list.0.consignee.first_name }} {{ reservasi_list.0.consignee.last_name }}</p>
+                        <p><strong>EIR In:</strong> <span class="badge bg-secondary text-light">Unknown</span></p>
+                        <p><strong>EIR Out:</strong> <span class="badge bg-secondary text-light">Unknown</span></p>
+                    </div>
+                    <div class="col-detail">
+                        <p><strong>Status:</strong> <span class="badge bg-secondary text-light">{{ reservasi_list.0.get_status_display}}</span></p>
+                        <p><strong>Tracking Status:</strong> <span class="badge bg-secondary text-light">{{ reservasi_list.0.get_track_in_display}}</span></p>
+                        <p><strong>Schedule In:</strong> <span class="badge bg-secondary text-light">Unknown</span></p>
+                    </div>
+                </div>
+            </div>
+
+            {% if reservasi_list %}
+            <table class="nota-table">
+                <thead>
+                    <tr></tr>
+                        <th>No</th>
+                        <th>Container</th>
+                        <th>Truck</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reservasi_list %}
+                    <tr>
+                        <td width="2%" align="center">{{ forloop.counter }}</td>
+                        <td width="49%">{{ r.data_container }}</td>
+                        <td width="49%">{{ r.data_truck }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>Reservasi tidak ditemukan.</p>
+            {% endif %}
+            <a href="{% url 'consignee:schedule' %}" class="btn btn-secondary">← Kembali</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

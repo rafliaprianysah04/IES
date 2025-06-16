@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Untuk Kamu ❤️</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #ff9a9e, #fad0c4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #fff;
+      text-align: center;
+      overflow: hidden;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin: 0.5em 0;
+    }
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .btn {
+      background-color: #fff;
+      color: #ff5e78;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 50px;
+      margin: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn:hover {
+      background-color: #ff5e78;
+      color: white;
+    }
+    #message {
+      margin-top: 2rem;
+      font-size: 1.5rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Hai, <span id="namaCewek">...</span> 🌸</h1>
+<p id="typing">Aku suka sama kamu, mau jadi pacarku ga?...</p>
+
+<button class="btn" onclick="jawab()">Iya 🥰</button>
+<button class="btn" onclick="jawab()">Mau Banget 😍</button>
+
+<p id="message">Yay! Aku juga udah lama naksir kamu 😭❤️</p>
+
+<audio autoplay loop>
+  <source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="confetti" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: 999;"></canvas>
+
+<script>
+  const namaCewek = "Silvi"; // Ganti nama cewek di sini
+  const elNama = document.getElementById("namaCewek");
+  const msg = document.getElementById("message");
+
+  // Typing effect
+  let i = 0;
+  function ketik() {
+    if (i < namaCewek.length) {
+      elNama.textContent += namaCewek.charAt(i);
+      i++;
+      setTimeout(ketik, 150);
+    }
+  }
+  ketik();
+
+  function jawab() {
+    msg.style.display = "block";
+    startConfetti();
+  }
+
+  // Confetti 🎉
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let pieces = [];
+
+  for (let i = 0; i < 100; i++) {
+    pieces.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 20 + 10,
+      d: Math.random() * 20,
+      color: `hsl(${Math.random() * 360}, 70%, 70%)`,
+      tilt: Math.random() * 10 - 10,
+      tiltAngle: 0
+    });
+  }
+
+  function drawConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i in pieces) {
+      let p = pieces[i];
+      ctx.beginPath();
+      ctx.lineWidth = p.r / 2;
+      ctx.strokeStyle = p.color;
+      ctx.moveTo(p.x + p.tilt + p.r / 4, p.y);
+      ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 4);
+      ctx.stroke();
+    }
+    updateConfetti();
+  }
+
+  function updateConfetti() {
+    for (let i in pieces) {
+      let p = pieces[i];
+      p.tiltAngle += 0.1;
+      p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+      p.x += Math.sin(0);
+      p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+      if (p.y > canvas.height) {
+        p.y = -10;
+        p.x = Math.random() * canvas.width;
+      }
+    }
+  }
+
+  let confettiInterval;
+  function startConfetti() {
+    confettiInterval = setInterval(drawConfetti, 30);
+    setTimeout(() => clearInterval(confettiInterval), 5000); // stop after 5 sec
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+{% extends 'base_customer_service.html' %}
+{% block title %}Dashboard Customer Service{% endblock %}
+
+{% block content %}
+<style>
+    .menu-card {
+        transition: transform 0.2s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        border: none;
+        background-color: #007bff; /* Card biru mencolok */
+        color: white;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        border-radius: 1rem;
+    }
+
+    .menu-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        background-color: #0056b3; /* Hover lebih gelap */
+    }
+
+    .square-card {
+        aspect-ratio: 1 / 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1.2rem;
+    }
+
+    .icon-wrapper {
+        background-color: white;
+        color: #007bff;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+        font-size: 1.8rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .square-card h6 {
+        margin-top: 1rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: white;
+    }
+</style>
+
+<div class="container mt-4">
+    <h3 class="mb-4">Dashboard Customer Service</h3>
+
+    <div class="row gx-3 gy-4">
+        <!-- Approval Request -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <a href="{% url 'customer_service:approve_reservasi' %}" class="text-decoration-none">
+                <div class="card menu-card text-center square-card">
+                    <div>
+                        <div class="icon-wrapper mb-2">
+                            <i class="fas fa-list-check"></i>
+                        </div>
+                        <h6>Approval Reservasi</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

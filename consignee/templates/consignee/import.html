@@ -1,0 +1,207 @@
+{% extends 'base_surveyor.html' %}
+{% load static %}
+{% block title %}Upload Foto Under{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 px-3">
+        <h1 class="h3 mb-0 text-dark">Upload Foto Under</h1>
+        <a href="{% url 'surveyor:dashboard' %}" class="btn btn-secondary">← Kembali</a>
+    </div>
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Form Upload Under Container</strong>
+            </div>
+            <div class="card-body card-block">
+                <form id="containerForm" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Input No Container -->
+                    <div class="form-group">
+                        <label for="container_no" class="form-control-label">No Container</label>
+                        <input type="text" id="container_no" name="container_no" class="form-control" placeholder="Contoh: ABCD123456" autocomplete="off">
+                    </div>
+
+                    <!-- Notifikasi status -->
+                    <div class="form-group">
+                        <small id="status_check" class="form-text text-muted" style="display: none;"></small>
+                    </div>
+
+                    <!-- Hidden container_no untuk submit -->
+                    <input type="hidden" id="container_no_hidden" name="container_no_hidden">
+
+                    <!-- Upload Foto -->
+                    <div id="photoSection" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-control-label">Upload Foto Under</label>
+
+                            <!-- Area Drag & Drop -->
+                            <div id="drop-area-photo" class="border border-secondary text-center p-4" style="cursor: pointer;">
+                                <i class="fa fa-camera fa-3x text-secondary"></i>
+                                <p class="mt-2">Drag & Drop foto di sini atau klik untuk memilih</p>
+                                <input type="file" id="container_photos" name="photos" accept="image/*" hidden multiple>
+                                <div id="photo-preview" class="mt-3 d-flex flex-wrap gap-2"></div>
+                            </div>
+
+                            <!-- Tombol kamera langsung (khusus mobile) -->
+                            <div class="mt-2">
+                                <input type="file" id="camera_capture" accept="image/*" capture="environment" class="form-control-file">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="btnSubmit">Upload Foto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const containerInput = document.getElementById('container_no');
+    const statusSpan = document.getElementById('status_check');
+    const photoSection = document.getElementById('photoSection');
+    const hiddenInput = document.getElementById('container_no_hidden');
+    const form = document.getElementById('containerForm');
+
+    const dropArea = document.getElementById("drop-area-photo");
+    const fileInput = document.getElementById("container_photos");
+    const cameraInput = document.getElementById("camera_capture");
+    const previewArea = document.getElementById("photo-preview");
+
+    const fileBuffer = new DataTransfer();
+
+    // === Drag & Drop Area ===
+    dropArea.addEventListener("click", () => fileInput.click());
+
+    dropArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropArea.classList.add("border-primary");
+    });
+
+    dropArea.addEventListener("dragleave", () => {
+        dropArea.classList.remove("border-primary");
+    });
+
+    dropArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropArea.classList.remove("border-primary");
+        appendFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener("change", () => appendFiles(fileInput.files));
+    cameraInput.addEventListener("change", () => appendFiles(cameraInput.files));
+
+    function appendFiles(files) {
+        const existing = Array.from(fileBuffer.files);
+        Array.from(files).forEach(file => {
+            const duplicate = existing.some(f =>
+                f.name === file.name &&
+                f.size === file.size &&
+                f.lastModified === file.lastModified
+            );
+            if (!duplicate) fileBuffer.items.add(file);
+        });
+        fileInput.files = fileBuffer.files;
+        showPreview(fileBuffer.files);
+    }
+
+    function showPreview(files) {
+        previewArea.innerHTML = '';
+        Array.from(files).forEach(file => {
+            if (file.type.startsWith("image/")) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.classList.add("img-thumbnail");
+                    img.style.width = "100px";
+                    img.style.height = "100px";
+                    img.style.marginRight = "5px";
+                    previewArea.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // === Validasi No Container ke server ===
+    function validateContainerNo() {
+        const containerNo = containerInput.value.trim();
+        if (containerNo !== '') {
+            fetch("{% url 'surveyor:verify_container_exists' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: new URLSearchParams({
+                    container_no: containerNo
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    statusSpan.textContent = `✅ Container valid - ${data.container_no}`;
+                    statusSpan.style.color = 'green';
+                    statusSpan.style.display = 'block';
+
+                    hiddenInput.value = data.container_no;
+                    photoSection.style.display = 'block';
+                } else {
+                    statusSpan.textContent = '❌ Container tidak ditemukan';
+                    statusSpan.style.color = 'red';
+                    statusSpan.style.display = 'block';
+
+                    hiddenInput.value = '';
+                    photoSection.style.display = 'none';
+                }
+            });
+        }
+    }
+
+    containerInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            validateContainerNo();
+        }
+    });
+    containerInput.addEventListener('blur', validateContainerNo);
+
+    // === Submit form foto ===
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        fetch("{% url 'surveyor:upload_under_photo' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                Swal.fire('Berhasil!', 'Foto berhasil diupload.', 'success');
+                form.reset();
+                fileBuffer.clearData();
+                fileInput.files = fileBuffer.files;
+                previewArea.innerHTML = '';
+                statusSpan.style.display = 'none';
+                photoSection.style.display = 'none';
+            } else {
+                Swal.fire('Gagal!', data.message || 'Terjadi kesalahan.', 'error');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            Swal.fire('Oops!', 'Gagal mengirim data ke server.', 'error');
+        });
+    });
+});
+</script>
+{% endblock %}

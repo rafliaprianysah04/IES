@@ -1,0 +1,85 @@
+{% load static %}
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Surveyor - {% block title %}Intercon{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{% static 'assets/css/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/themify-icons.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/flag-icon.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/cs-skin-elastic.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/scss/style.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/lib/datatable/dataTables.bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        .dropdown-toggle::after {
+            display: none;
+        }
+        .dropdown-menu {
+            min-width: 160px;
+        }
+        @media (max-width: 576px) {
+            .dropdown-menu {
+                left: auto !important;
+                right: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Topbar Only (No Sidebar) -->
+<header id="header" class="header bg-light py-2 shadow-sm px-4 d-flex justify-content-between align-items-center">
+    <!-- Logo -->
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'surveyor:dashboard' %}">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" style="height: 40px;">
+    </a>
+
+    <!-- User Info -->
+    <div class="dropdown">
+        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button"
+           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="gap: 0.5rem;">
+            <img class="user-avatar rounded-circle" src="{% static 'images/admin.jpg' %}" alt="User Avatar" width="35" height="35">
+            <span class="d-none d-sm-inline-block">{{ user.first_name }} {{ user.last_name }}</span>
+        </a>
+    </div>
+</header>
+
+<!-- Main Content -->
+<div class="content mt-4 px-4">
+    {% block content %}{% endblock %}
+</div>
+
+<!-- Scripts -->
+<script src="{% static 'assets/js/vendor/jquery-2.1.4.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'assets/js/main.js' %}"></script>
+<script src="{% static 'assets/js/lib/data-table/datatables.min.js' %}"></script>
+<script src="{% static 'assets/js/lib/data-table/dataTables.bootstrap.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+<script>
+    {% if messages %}
+        {% for message in messages %}
+            Toastify({
+                text: "{{ message }}",
+                backgroundColor: "{% if message.tags == 'success' %}green{% elif message.tags == 'error' %}red{% else %}gray{% endif %}",
+                close: true,
+                position: "top-center",
+                duration: 3000,
+            }).showToast();
+        {% endfor %}
+    {% endif %}
+</script>
+
+</body>
+</html>

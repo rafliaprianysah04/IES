@@ -1,0 +1,143 @@
+{% extends 'base_gate_in_out.html' %}
+{% load static %}
+{% block title %}Export Truck Out{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 px-3">
+        <h1 class="h3 mb-0 text-dark">Export Truck Out</h1>
+        <a href="{% url 'gate_in_out:dashboard' %}" class="btn btn-secondary">← Kembali</a>
+    </div>
+
+    <div class="col-md-12">
+        <!-- Badge waktu realtime dengan keterangan -->
+        <div class="d-flex justify-content-start mb-2">
+            <div id="realtime-clock" class="badge badge-primary p-2" style="font-size: 1rem;">
+                Loading time...
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <strong>Form Export Truck Out</strong>
+            </div>
+            <div class="card-body card-block">
+                <form id="placementForm" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Input Truck No -->
+                    <div class="form-group">
+                        <label for="truck_no" class="form-control-label">Truck No</label>
+                        <input type="text" id="truck_no" name="truck_no" class="form-control" placeholder="Contoh: B 1234 CD" autocomplete="off">
+                    </div>
+
+                    <!-- Input Trucking Name -->
+                    <div class="form-group">
+                        <label for="trucking_name" class="form-control-label">Trucking Name</label>
+                        <input type="text" id="trucking_name" name="trucking_name" class="form-control" placeholder="Contoh: PT Trucking Sejahtera" autocomplete="off">
+                    </div>
+
+                    <!-- Upload Foto -->
+                    <div id="photoSection">
+                        <div class="form-group">
+                            <label class="form-control-label">Upload Foto Truck</label>
+
+                            <!-- Area Drag & Drop -->
+                            <div id="drop-area-photo" class="border border-secondary text-center p-4" style="cursor: pointer;">
+                                <i class="fa fa-camera fa-3x text-secondary"></i>
+                                <p class="mt-2">Drag & Drop foto di sini atau klik untuk memilih</p>
+                                <input type="file" id="truck_photos" name="photos" accept="image/*" hidden multiple>
+                                <div id="photo-preview" class="mt-3 d-flex flex-wrap gap-2"></div>
+                            </div>
+
+                            <!-- Tombol kamera langsung (khusus mobile) -->
+                            <div class="mt-2">
+                                <input type="file" id="camera_capture" name="camera_capture" accept="image/*" capture="environment" class="form-control-file">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="btnSubmit">Upload Foto</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById('placementForm');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+
+        fetch("{% url 'surveyor:simpan_penempatan_container' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                Swal.fire('Berhasil!', 'Penempatan container berhasil disimpan.', 'success');
+                form.reset();
+                document.getElementById('photo-preview').innerHTML = '';
+            } else {
+                Swal.fire('Gagal!', data.message || 'Terjadi kesalahan.', 'error');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            Swal.fire('Oops!', 'Gagal mengirim data ke server.', 'error');
+        });
+    });
+
+    // Klik pada area drop untuk membuka file picker
+    document.getElementById('drop-area-photo').addEventListener('click', function () {
+        document.getElementById('truck_photos').click();
+    });
+
+    // Preview foto setelah dipilih
+    document.getElementById('truck_photos').addEventListener('change', function (e) {
+        const preview = document.getElementById('photo-preview');
+        preview.innerHTML = '';
+        for (const file of e.target.files) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const img = document.createElement('img');
+                img.src = event.target.result;
+                img.style.width = '100px';
+                img.style.height = '100px';
+                img.style.objectFit = 'cover';
+                img.classList.add('border', 'rounded');
+                preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Realtime Clock
+    function updateClock() {
+        const clockElement = document.getElementById('realtime-clock');
+        const now = new Date();
+        const formattedTime = now.toLocaleString('id-ID', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+        clockElement.textContent = "EIR Out Time: " + formattedTime;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+});
+</script>
+{% endblock %}

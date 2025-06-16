@@ -1,0 +1,157 @@
+{% extends 'base_surveyor.html' %}
+{% load static %}
+{% block title %}Reservasi{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 px-3">
+        <h1 class="h3 mb-0 text-dark">Reservasi</h1>
+        <a href="{% url 'consignee:dashboard' %}" class="btn btn-secondary">← Kembali</a>
+    </div>    
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Form Reservasi</strong>
+            </div>
+            <div class="card-body card-block">
+                <form id="containerForm" method="POST">
+                    {% csrf_token %}
+
+                    <!-- Reservasi Order ID -->
+                    <div class="form-group">
+                        <label for="reservasi_id" class="form-control-label">Reservasi Order ID</label>
+                        <input type="text" id="reservasi_id" name="reservasi_id" class="form-control" placeholder="Masukkan ID Reservasi" autocomplete="off" value="{{ generated_reservasi_id }}" readonly>
+                    </div>
+
+                    <!-- Tombol Add Data -->
+                    <button type="button" class="btn btn-sm btn-success mb-2" id="btnAddData">+ Add Data</button>
+
+                    <hr style="margin-top: 5px; margin-bottom: 10px;">
+
+                    <!-- Container untuk label dan input field -->
+                    <div id="additionalFields"></div>
+
+                    <hr style="margin-top: 10px; margin-bottom: 5px;">
+
+                    <!-- Submit Buttons -->
+                    <div class="form-group mt-3">
+                        <button type="button" class="btn btn-primary" id="btnSubmit" disabled>Simpan Reservasi</button>
+                        <button type="reset" class="btn btn-danger">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Script -->
+<script>
+    let fieldCount = 0;
+    let labelAdded = false;
+
+    document.getElementById('btnAddData').addEventListener('click', function () {
+        const additionalFields = document.getElementById('additionalFields');
+
+        if (!labelAdded) {
+            const labelRow = document.createElement('div');
+            labelRow.classList.add('row', 'mb-1');
+            labelRow.innerHTML = `
+                <div class="col-md-1"><label class="form-control-label">No</label></div>
+                <div class="col-md-5"><label class="form-control-label">No Container</label></div>
+                <div class="col-md-6"><label class="form-control-label">No Truck</label></div>
+            `;
+            additionalFields.appendChild(labelRow);
+            labelAdded = true;
+        }
+
+        fieldCount++;
+        const newFields = document.createElement('div');
+        newFields.classList.add('row', 'mb-1');
+        newFields.innerHTML = `
+            <div class="col-md-1 d-flex align-items-center"><span>${fieldCount}</span></div>
+            <div class="col-md-5">
+                <input type="text" id="container_no_${fieldCount}" name="container_no_${fieldCount}" class="form-control form-control-sm" placeholder="Contoh: ABCD123456" autocomplete="off">
+            </div>
+            <div class="col-md-6">
+                <input type="text" id="truck_no_${fieldCount}" name="truck_no_${fieldCount}" class="form-control form-control-sm" placeholder="Contoh: B1234XYZ" autocomplete="off">
+            </div>
+        `;
+        additionalFields.appendChild(newFields);
+
+        document.getElementById('btnSubmit').disabled = false;
+    });
+
+    document.querySelector('button[type="reset"]').addEventListener('click', function () {
+        document.getElementById('additionalFields').innerHTML = '';
+        fieldCount = 0;
+        labelAdded = false;
+        document.getElementById('btnSubmit').disabled = true;
+    });
+
+    document.getElementById('btnSubmit').addEventListener('click', function () {
+        Swal.fire({
+            title: 'Apakah data reservasi sudah benar?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Tidak',
+            reverseButtons: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Kumpulkan data dari form
+                const reservasiId = document.getElementById('reservasi_id').value; // Ambil value dari input Reservasi ID
+                let dataContainer = [];
+                let dataTruck = [];
+
+                // Loop untuk mengambil data container dan truck berdasarkan field yang ditambahkan
+                for (let i = 1; i <= fieldCount; i++) {
+                    const containerNo = document.getElementById(`container_no_${i}`).value;
+                    const truckNo = document.getElementById(`truck_no_${i}`).value;
+                    dataContainer.push(containerNo);  // Menambahkan data container
+                    dataTruck.push(truckNo);  // Menambahkan data truck
+                }
+
+                // Kirim AJAX request ke Django view
+                fetch("{% url 'consignee:simpan_reservasi_db' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: JSON.stringify({
+                        reservasi_id: reservasiId,
+                        data_container: dataContainer,  // Kirim sebagai array
+                        data_truck: dataTruck  // Kirim sebagai array
+                    })
+                })
+                .then(async response => {
+                    const text = await response.text();
+                    try {
+                        const data = JSON.parse(text);
+                        if (data.success) {
+                            Swal.fire("Berhasil!", data.message, "success").then(() => location.reload());
+                        } else {
+                            Swal.fire("Gagal", data.message, "error");
+                        }
+                    } catch (e) {
+                        console.error("Respon bukan JSON valid:", text);
+                        Swal.fire("Gagal", "Respon server tidak valid (bukan JSON).", "error");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    Swal.fire("Gagal", "Terjadi kesalahan saat menyimpan data.", "error");
+                });
+            }
+        });
+    });
+</script>
+
+<!-- QRCode library -->
+<script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+{% endblock %}

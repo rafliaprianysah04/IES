@@ -1,0 +1,550 @@
+{% extends 'base_customer_service.html' %}
+
+{% block title %}List Reservasi{% endblock %}
+
+{% block content %}
+<style>
+    /* Untuk kontainer utama detail dalam SweetAlert */
+    .swal2-html-container .nota {
+        width: 100%;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background-color: #fff;
+    }
+
+    .nota-header p {
+        font-size: 14px;
+        margin: 4px 0;
+    }
+
+    .nota-header p strong {
+        font-weight: bold;
+    }
+
+    .nota-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    .nota-table th,
+    .nota-table td {
+        padding: 6px 10px;
+        text-align: left;
+        font-size: 13px;
+        border: 1px solid #ddd;
+    }
+
+    .nota-table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+
+    .nota-table tbody tr:nth-child(odd) {
+        background-color: #f9f9f9;
+    }
+
+    .nota-table tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .row-detail {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 40px;
+        margin-top: 10px;
+    }
+
+    .col-detail {
+        flex: 1;
+        min-width: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+
+    .col-detail p {
+        margin: 3px 0;
+        font-size: 14px;
+    }
+
+    .col-detail strong {
+        font-weight: bold;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 px-3">
+        <h1 class="h3 mb-0 text-dark">Daftar Reservasi</h1>
+        <a href="{% url 'customer_service:dashboard' %}" class="btn btn-secondary">← Kembali</a>
+    </div>
+
+    <!-- DataTable -->
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <strong class="card-title">Data Reservasi</strong>
+            </div>
+            <div class="card-body">
+                <table id="bootstrap-data-table" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>ID Reservasi</th>
+                            <th>Container</th>
+                            <th>Status</th>
+                            <th>Tracking In</th>
+                            <th>Tracking Out</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reservasi %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ r.reservasi_id }}</td>
+                            <td>{{ r.jumlah_container }} Container Terdaftar</td>
+                            <td>
+                                {% if r.status == 0 %}
+                                    <span class="badge bg-warning">{{ r.get_status_display }}</span>
+                                {% elif r.status == 1 %}
+                                    <span class="badge bg-primary">{{ r.get_status_display }}</span>
+                                {% elif r.status == 2 or r.status == 3 %}
+                                    <span class="badge bg-danger">{{ r.get_status_display }}</span>
+                                {% else %}
+                                    <span class="badge bg-light">No Action</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if r.track_in == 0 %}
+                                    <span class="badge bg-secondary">{{ r.get_track_in_display }}</span>
+                                {% elif r.track_in == 1 %}
+                                    <span class="badge bg-info">{{ r.get_track_in_display }}</span>
+                                {% elif r.track_in == 2 %}
+                                    <span class="badge bg-primary">{{ r.get_track_in_display }}</span>
+                                {% elif r.track_in == 3 %}
+                                    <span class="badge bg-warning">{{ r.get_track_in_display }}</span>
+                                {% elif r.track_in == 4 or r.track_in == 5 %}
+                                    <span class="badge bg-success">{{ r.get_track_in_display }}</span>
+                                {% elif r.track_in == 6 %}
+                                    <span class="badge bg-danger">{{ r.get_track_in_display }}</span>
+                                {% elif r.track_in == 7 %}
+                                    <span class="badge bg-dark">{{ r.get_track_in_display }}</span>
+                                {% else %}
+                                    <span class="badge bg-light">No Action</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if r.track_out == 0 %}
+                                    <span class="badge bg-secondary">{{ r.get_track_out_display }}</span>
+                                {% elif r.track_out == 1 %}
+                                    <span class="badge bg-info">{{ r.get_track_out_display }}</span>
+                                {% elif r.track_out == 2 %}
+                                    <span class="badge bg-primary">{{ r.get_track_out_display }}</span>
+                                {% elif r.track_out == 3 %}
+                                    <span class="badge bg-warning">{{ r.get_track_out_display }}</span>
+                                {% elif r.track_out == 4 %}
+                                    <span class="badge bg-success">{{ r.get_track_out_display }}</span>
+                                {% elif r.track_out == 5 %}
+                                    <span class="badge bg-dark">{{ r.get_track_out_display }}</span>
+                                {% else %}
+                                    <span class="badge bg-light">No Action</span>
+                                {% endif %}
+                            </td>
+                            <td width="18%">
+                                {% if r.status == 0 %}
+                                    <a href="#" class="btn btn-sm btn-success btn-approve"
+                                        data-url="{% url 'customer_service:reservasi_detail' r.reservasi_id %}"
+                                        title="Approve"
+                                        data-approve-url="{% url 'customer_service:approve_reservasi_done' r.reservasi_id %}"
+                                        data-id="{{ r.reservasi_id }}">
+                                        <i class="fa fa-check"></i> Approve
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-danger btn-reject" data-url="#" title="Rejected" >
+                                        <i class="fa fa-times"></i> Rejected
+                                    </a>
+                                {% else %}
+                                    <a href="#" class="btn btn-sm btn-info btn-schedule mr-5 ml-5" data-url="{% url 'customer_service:reservasi_detail' r.reservasi_id %}" title="Set Schedule" data-id="{{ r.reservasi_id }}">
+                                        <i class="fa fa-calendar-check-o"></i> Set Schedule
+                                    </a>
+                                    <!-- Tidak menampilkan tombol jika status > 0 -->
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="14" class="text-center">Belum ada data reservasi.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const approveButtons = document.querySelectorAll('.btn-approve');
+        const rejectButtons = document.querySelectorAll('.btn-reject');
+        const scheduleButtons = document.querySelectorAll('.btn-schedule');
+
+        approveButtons.forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const reservasiId = button.dataset.id;
+
+                Swal.fire({
+                    title: 'Yakin ingin menyetujui?',
+                    text: "Reservasi ini akan disetujui.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, setujui!',
+                    cancelButtonText: 'Batal',
+                    showDenyButton: true,
+                    denyButtonText: 'Cek Detail Reservasi',
+                    denyButtonColor: '#007bff',
+                    width: 500,
+                    heightAuto: true,
+                    customClass: {
+                        popup: 'swal2-popup-narrow'
+                    },
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const approveUrl = button.dataset.approveUrl;
+
+                        // Mengirim permintaan POST untuk menyetujui reservasi
+                        fetch(approveUrl, {
+                            method: 'GET',  // Menggunakan GET karena tidak ada body yang dikirim
+                            headers: {
+                                'X-CSRFToken': getCookie('csrftoken')  // Mengambil CSRF token dari cookie
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Gagal menyetujui reservasi');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            Swal.fire('Disetujui!', 'Reservasi ini sudah disetujui.', 'success')
+                                .then(() => {
+                                    location.reload();  // Reload halaman untuk update status
+                                });
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire('Gagal', 'Terjadi kesalahan saat menyetujui reservasi.', 'error');
+                        });
+
+                    } else if (result.isDenied) {
+                        const detailUrl = button.dataset.url;
+                        // Mengambil detail reservasi jika tombol "Cek Detail Reservasi" ditekan
+                        fetch(detailUrl)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Reservasi tidak ditemukan');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.reservasi && data.reservasi.length > 0) {
+                                    let reservasi = data.reservasi[0];
+                                    let htmlContent = '';
+
+                                    // Menampilkan detail reservasi
+                                    htmlContent += `
+                                        <div class="nota">
+                                            <div class="row-detail">
+                                                <div class="col-detail">
+                                                    <p><strong>Reservasi ID:</strong> ${reservasi.reservasi_id}</p>
+                                                    <p><strong>Consignee:</strong> ${reservasi.consignee.name}</p>
+                                                    <p><strong>Status:</strong> ${reservasi.status}</p>
+                                                </div>
+                                                <div class="col-detail">
+                                                    <p><strong>Track In:</strong> ${reservasi.track_in}</p>
+                                                    <p><strong>Track Out:</strong> ${reservasi.track_out ? reservasi.track_out : 'Unknown'}</p>
+                                                </div>
+                                            </div>
+
+                                            <table class="nota-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Container</th>
+                                                        <th>Truck</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${data.reservasi.map((reservasiItem, index) => {
+                                                        return reservasiItem.containers.map((container, containerIndex) => {
+                                                            return ` 
+                                                                <tr>
+                                                                    <td align="center" width="6%">${index + 1}</td>
+                                                                    <td width="47%">${container.name}</td>
+                                                                    <td width="47%">${container.truck}</td>
+                                                                </tr>
+                                                            `;
+                                                        }).join('');
+                                                    }).join('')} 
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    `;
+
+                                    // Menampilkan detail reservasi dengan Swal
+                                    Swal.fire({
+                                        title: 'Detail Reservasi',
+                                        html: htmlContent,
+                                        width: '80%',
+                                        heightAuto: true,
+                                        confirmButtonText: 'Tutup',
+                                    });
+                                } else {
+                                    console.error('Tidak ada data reservasi yang ditemukan');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                Swal.fire('Error', 'Gagal memuat detail reservasi.', 'error');
+                            });
+                    }
+                });
+            });
+            // Handle Reject Button Click
+            rejectButtons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const reservasiId = button.dataset.id;
+
+                    Swal.fire({
+                        title: 'Yakin ingin menolak reservasi?',
+                        text: "Reservasi ini akan ditolak dan statusnya akan diubah.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#28a745',
+                        confirmButtonText: 'Ya, tolak!',
+                        cancelButtonText: 'Batal',
+                        width: 500,
+                        heightAuto: true,
+                        customClass: {
+                            popup: 'swal2-popup-narrow'
+                        },
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const rejectUrl = button.dataset.rejectUrl;
+
+                            fetch(rejectUrl, {
+                                method: 'GET',
+                                headers: {
+                                    'X-CSRFToken': getCookie('csrftoken')
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                Swal.fire('Ditolak!', 'Reservasi ini telah ditolak.', 'error')
+                                    .then(() => location.reload());
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                Swal.fire('Gagal', 'Terjadi kesalahan saat menolak reservasi.', 'error');
+                            });
+                        }
+                    });
+                });
+            });
+
+            scheduleButtons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const reservasiId = button.dataset.id;
+                    const detailUrl = button.dataset.url;
+
+                    // SweetAlert pertama: Pilih tanggal
+                    Swal.fire({
+                        title: 'Jadwalkan reservasi di tanggal',
+                        html: `
+                            <input type="date" id="tanggal-in" class="swal2-input" value="${new Date().toISOString().split('T')[0]}">
+                        `,
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#28a745',
+                        confirmButtonText: 'Pilih',
+                        cancelButtonText: 'Batal',
+                        width: 500,
+                        heightAuto: true,
+                        preConfirm: () => {
+                            const tanggalIn = document.getElementById('tanggal-in').value;
+                            if (!tanggalIn) {
+                                Swal.showValidationMessage('Tanggal IN harus dipilih');
+                                return false;
+                            }
+                            return tanggalIn;
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const tanggalIn = result.value;
+
+                            // Setelah tanggal dipilih, baru fetch detail reservasi
+                            fetch(detailUrl)
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Reservasi tidak ditemukan');
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (data.reservasi && data.reservasi.length > 0) {
+                                        let reservasi = data.reservasi[0];
+                                        let detailHtml = `
+                                            <div class="nota">
+                                                <table class="nota-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No</th>
+                                                            <th>Container</th>
+                                                            <th>Truck</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        ${data.reservasi.map((item, index) =>
+                                                            item.containers.map((container, idx) => `
+                                                                <tr>
+                                                                    <td align="center">${index + 1}</td>
+                                                                    <td>${container.name}</td>
+                                                                    <td>${container.truck}</td>
+                                                                </tr>
+                                                            `).join('')
+                                                        ).join('')}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        `;
+
+                                        // SweetAlert kedua: Tampilkan detail dan jadwal
+                                        Swal.fire({
+                                            title: 'Pilih Batch dan Jam',
+                                            html: `
+                                                ${detailHtml}
+                                                <hr>
+                                                <style>
+                                                    .clickable-cell {
+                                                        cursor: pointer;
+                                                        transition: background-color 0.2s;
+                                                    }
+                                                    .clickable-cell.selected {
+                                                        background-color: #b9fbc0;
+                                                    }
+                                                </style>
+                                                <div style="overflow-x: auto;">
+                                                    <table id="schedule-table" style="width: 100%; min-width: 1600px; border-collapse: collapse; font-size: 14px;">
+                                                        <thead>
+                                                            <tr style="background-color: #f2f2f2;">
+                                                                <th style="border: 1px solid #ccc; padding: 10px; text-align: center;"></th>
+                                                                ${Array.from({ length: 24 }, (_, i) => {
+                                                                    const h = i.toString().padStart(2, '0');
+                                                                    const hNext = ((i + 1) % 24).toString().padStart(2, '0');
+                                                                    return `<th style="border: 1px solid #ccc; padding: 6px 8px; text-align: center; white-space: nowrap;">${h}:00 - ${hNext}:00</th>`;
+                                                                }).join('')}
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            ${Array.from({ length: 10 }, (_, b) => `
+                                                                <tr>
+                                                                    <td style="border: 1px solid #ccc; padding: 10px; text-align: center;">${b + 1}</td>
+                                                                    ${Array.from({ length: 24 }, (_, t) => `
+                                                                        <td class="clickable-cell" data-batch="${b + 1}" data-time="${t}" style="border: 1px solid #ccc; padding: 10px;"></td>
+                                                                    `).join('')}
+                                                                </tr>
+                                                            `).join('')}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            `,
+                                            width: 1100,
+                                            confirmButtonText: 'Tutup',
+                                            confirmButtonColor: '#28a745',
+                                            didOpen: () => {
+                                                document.querySelectorAll('.clickable-cell').forEach(cell => {
+                                                    cell.addEventListener('click', () => {
+                                                        cell.classList.toggle('selected');
+
+                                                        const batch = cell.dataset.batch;
+                                                        const time = cell.dataset.time;
+
+                                                        fetch('/set_schedule/', {
+                                                            method: 'POST',
+                                                            headers: {
+                                                                'Content-Type': 'application/json',
+                                                                'X-CSRFToken': getCookie('csrftoken')
+                                                            },
+                                                            body: JSON.stringify({
+                                                                reservasi_id: reservasiId,
+                                                                tanggal_in: tanggalIn,
+                                                                batch: batch,
+                                                                time: time
+                                                            })
+                                                        })
+                                                        .then(response => {
+                                                            if (!response.ok) throw new Error('Gagal');
+                                                            return response.json();
+                                                        })
+                                                        .then(data => {
+                                                            cell.style.backgroundColor = '#d4edda';
+                                                            cell.style.borderColor = '#28a745';
+
+                                                            Swal.fire({
+                                                                title: 'Informasi Jadwal',
+                                                                text: `Batch: ${batch}, Time: ${time}`,
+                                                                icon: 'info',
+                                                                confirmButtonText: 'Tutup'
+                                                            });
+                                                        })
+                                                        .catch(() => {
+                                                            cell.style.backgroundColor = '#f8d7da';
+                                                            cell.style.borderColor = '#dc3545';
+                                                        });
+                                                    });
+                                                });
+                                            }
+                                        });
+                                    } else {
+                                        Swal.fire('Oops', 'Data reservasi tidak ditemukan.', 'warning');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    Swal.fire('Error', 'Gagal memuat detail reservasi.', 'error');
+                                });
+                        }
+                    });
+                });
+            });
+        });
+
+        // Fungsi untuk mengambil CSRF Token dari cookie
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+
+{% endblock %}
