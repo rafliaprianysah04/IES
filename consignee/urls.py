@@ -8,7 +8,10 @@ app_name = 'consignee'
 urlpatterns = [
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('import/', views.import_view, name='import'),
-    path('export/', views.dashboard_view, name='export'),
+    path('keranjang/', views.keranjang, name='keranjang'), #Dimas (17-06-2025)
+    #path('export/', views.export_view, name='export'),
+    path('export/', views.container_export, name='export'), #Dimas (17-06-2025)
+    path('export/detail_export/<int:id>/', views.detail_export, name='detail_export'), #Dimas (17-06-2025)
     path('schedule/', views.schedule_view, name='schedule'),
     path('schedule/detail/<str:reservasi_id>/', views.reservasi_detail_view, name='reservasi_detail'),
 

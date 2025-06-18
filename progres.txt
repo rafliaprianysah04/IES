@@ -1,0 +1,6 @@
+Progress M. Dimas Hermawansyah :
+17-06-2025 (Selasa)
+
+Menambahkan fitur export di folder consignee:
+1. templates : export.html, detail_export.html 
+2.Views consignee : container_export, detail_export, 

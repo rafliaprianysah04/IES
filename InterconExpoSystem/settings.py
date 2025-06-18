@@ -88,9 +88,9 @@ WSGI_APPLICATION = 'InterconExpoSystem.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'interconexposystem',       
-        'USER': 'rafly1',           
-        'PASSWORD': '1234',   
+        'NAME': 'interconnewsystem',       
+        'USER': 'postgres',           
+        'PASSWORD': '123456',   
         'HOST': 'localhost',           
         'PORT': '5432',                
     }

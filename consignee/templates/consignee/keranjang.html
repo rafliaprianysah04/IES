@@ -1,0 +1,34 @@
+{% extends 'base_consignee.html' %}
+{% load static %}
+
+{% block title %}Daftar Peti Kemas{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="text-center mb-4">
+    <h2 class="fw-bold text-dark">🛒 Keranjang Anda</h2>
+    <p class="text-muted">Silahkan melakukan pengorderan untuk transaksi lebih lanjut</p>
+  </div>
+
+
+  {% if containers %}
+    <div class="row g-3">
+      {% for c in containers %}
+        <div class="col-md-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">{{ c.container_no }}</h5>
+              <p class="card-text">Size: {{ c.size }} | Type: {{ c.container_type }}</p>
+              <p class="text-muted small">{{ c.remark|truncatechars:50 }}</p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">Keranjang masih kosong.</p>
+  {% endif %}
+</div>
+{% endblock %}

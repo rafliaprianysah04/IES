@@ -1,0 +1,105 @@
+<!-- 
+  M. Dimas Hermawansyah
+  17 - 06 - 2025
+-->
+{% extends 'base_consignee.html' %}
+{% load static %}
+
+{% block title %}Detail Container{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h4 class="text-center mb-4">Detail Container: {{ surveyincontainer.container_no }}</h4>
+
+  <div class="card shadow-sm rounded-4">
+    <div class="card-body p-3">
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Container</div>
+        <div class="col-7">{{ surveyincontainer.container_no }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Customer Code</div>
+        <div class="col-7">{{ surveyincontainer.customer_code }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Size / Type</div>
+        <div class="col-7">{{ surveyincontainer.size }} / {{ surveyincontainer.container_type }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Condition</div>
+        <div class="col-7">{{ surveyincontainer.condition }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Grade</div>
+        <div class="col-7">{{ surveyincontainer.grade }}</div>
+      </div>
+
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Created / Updated</div>
+        <div class="col-7">
+          {{ surveyincontainer.created_at|date:"Y-m-d H:i" }}
+        </div>
+      </div>
+
+                {% if folder_photos %}
+            <div class="row mb-3">
+            <div class="col-12">
+                <h6>Foto Tambahan:</h6>
+                <div class="row">
+                {% for photo in folder_photos %}
+                <div class="col-6 col-md-4 col-lg-3 mb-3">
+                    <img src="{{ photo }}" alt="Foto Tambahan"
+                        class="img-fluid rounded border"
+                        style="max-height: 200px; cursor: pointer;"
+                        data-bs-toggle="modal" data-bs-target="#photoModal"
+                        onclick="showModalImage('{{ photo }}')">
+                </div>
+                {% endfor %}
+                </div>
+            </div>
+            </div>
+            {% else %}
+            <div class="row mb-3">
+            <div class="col-12 text-center text-muted"><em>Belum ada foto tambahan</em></div>
+            </div>
+            {% endif %}
+
+      <div class="text-center">
+        <a href="{% url 'consignee:export' %}" class="btn btn-outline-secondary btn-sm px-4 rounded-pill">Kembali</a>
+      </div>
+
+
+
+<!-- Modal Preview Foto -->
+<div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="photoModalLabel">Preview Photo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="modalImage" src="" alt="Preview" class="img-fluid rounded shadow mb-3">
+          <br>
+          <a id="downloadLink" href="#" class="btn btn-outline-primary" download target="_blank">
+            Download Foto
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+    function showModalImage(url) {
+      document.getElementById('modalImage').src = url;
+      document.getElementById('downloadLink').href = url;
+    }
+</script>
+
+{% endblock %}
