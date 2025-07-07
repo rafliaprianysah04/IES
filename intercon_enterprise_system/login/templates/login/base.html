@@ -1,0 +1,46 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Login{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/app.css' %}">
+    <link rel="shortcut icon" href="{% static 'assets/images/favicon.svg' %}" type="image/x-icon">
+
+    <!-- ✅ Toastify -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+<body>
+    <div id="auth">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- ✅ Toastify JS -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <!-- ✅ Message logic -->
+    <script>
+        {% if messages %}
+            {% for message in messages %}
+                Toastify({
+                    text: "{{ message|escapejs }}",
+                    duration: 4000,
+                    gravity: "top",
+                    position: "right",
+                    close: true,
+                    backgroundColor: "{% if message.tags == 'success' %}#28a745{% elif message.tags == 'error' or message.tags == 'danger' %}#dc3545{% elif message.tags == 'warning' %}#ffc107{% else %}#17a2b8{% endif %}",
+                    stopOnFocus: true
+                }).showToast();
+            {% endfor %}
+        {% endif %}
+    </script>
+
+    <script src="{% static 'assets/js/feather-icons/feather.min.js' %}"></script>
+    <script src="{% static 'assets/js/app.js' %}"></script>
+    <script src="{% static 'assets/js/main.js' %}"></script>
+</body>
+</html>

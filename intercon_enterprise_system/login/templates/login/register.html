@@ -1,0 +1,74 @@
+{% extends 'login/base.html' %}
+{% load static %}
+
+{% block title %}Halaman Register{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-5 col-sm-12 mx-auto">
+            <div class="card pt-4">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <img src="{% static 'assets/images/intercon.jpg' %}" height="48" class='mb-4'>
+                        <h3>Register</h3>
+                        <p>Silakan isi form berikut untuk membuat akun baru.</p>
+                    </div>
+
+                    <form method="POST" action="">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="form-group col-md-6 position-relative has-icon-left">
+                                <label for="first_name">Nama Depan</label>
+                                <div class="position-relative">
+                                    {{ form.first_name }}
+                                    <div class="form-control-icon">
+                                        <i data-feather="user"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="form-group col-md-6 position-relative has-icon-left">
+                                <label for="last_name">Nama Belakang</label>
+                                <div class="position-relative">
+                                    {{ form.last_name }}
+                                    <div class="form-control-icon">
+                                        <i data-feather="user-check"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group position-relative has-icon-left">
+                            <label for="email">Email</label>
+                            <div class="position-relative">
+                                {{ form.email }}
+                                <div class="form-control-icon">
+                                    <i data-feather="mail"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group position-relative has-icon-left">
+                            <label for="password">Password</label>
+                            <div class="position-relative">
+                                {{ form.password }}
+                                <div class="form-control-icon">
+                                    <i data-feather="lock"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="clearfix mt-4">
+                            <a href="{% url 'login:login' %}">Sudah punya akun? Login</a>
+                            <button type="submit" class="btn btn-primary float-right">Daftar</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

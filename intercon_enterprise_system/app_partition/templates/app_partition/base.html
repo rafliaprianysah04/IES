@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <i class="fas fa-th-large"></i> Intercon Enterprise System
+        </div>
+        <div class="navbar-right">
+            {{ request.user.first_name|default:"Guest" }}  {{ request.user.last_name|default:"" }}
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        &copy; {{ now|date:"Y" }} Intercon Enterprise System. All rights reserved.
+    </footer>
+
+</body>
+</html>

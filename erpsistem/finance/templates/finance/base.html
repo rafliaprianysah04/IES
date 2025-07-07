@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Voler Admin Dashboard</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendors/chartjs/Chart.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/vendors/perfect-scrollbar/perfect-scrollbar.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/app.css' %}">
+    <link rel="shortcut icon" href="{% static 'assets/images/favicon.svg' %}" type="image/x-icon">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+<body>
+    <div id="app">
+        <div id="sidebar" class='active'>
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <img src="{% static 'assets/images/logo.svg' %}" alt="Logo">
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class='sidebar-title'>Main Menu</li>
+
+                        <li class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                            <a href="{% url 'finance:dashboard' %}?token={{ token }}" class='sidebar-link'>
+                                <i class="fas fa-home" width="20"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        
+                        {% for item in menu_with_subs %}
+                        <li class="sidebar-item {% if item.submenus %}has-sub{% endif %}">
+                            <a href="{% if item.submenus %}#{% else %}{{ item.url|default:'#' }}{% endif %}" class='sidebar-link'>
+                                <i class="{{ item.icon }}" width="20"></i>
+                                <span>{{ item.name }}</span>
+                            </a>
+                            {% if item.submenus %}
+                            <ul class="submenu">
+                                {% for sm in item.submenus %}
+                                <li>
+                                    <a href="{{ sm.url|default:'#' }}?token={{ token }}">
+                                        <i class="{{ sm.icon }}"></i> {{ sm.name }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+
+                        <li class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"></li>
+                            <a href="http://127.0.0.1:8000/login/logout" class='sidebar-link'>
+                                <i class="fas fa-arrow-left" width="20"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <nav class="navbar navbar-header navbar-expand navbar-light">
+                <a class="sidebar-toggler" href="#">
+                    <i data-feather="menu" width="20"></i>
+                </a>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav d-flex align-items-center navbar-light ml-auto">
+                        <!-- ... notification and user dropdowns ... -->
+                    </ul>
+                </div>
+            </nav>
+
+            {% block content %}
+            <!-- Page content will be injected here -->
+            {% endblock %}
+
+            <footer>
+                <div class="footer clearfix mb-0 text-muted">
+                    <div class="float-left">
+                        <p>2020 &copy; Voler</p>
+                    </div>
+                    <div class="float-right">
+                        <p>Crafted with <span class='text-danger'><i data-feather="heart"></i></span> by <a href="http://ahmadsaugi.com">Ahmad Saugi</a></p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{% static 'assets/js/feather-icons/feather.min.js' %}"></script>
+    <script src="{% static 'assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js' %}"></script>
+    <script src="{% static 'assets/js/app.js' %}"></script>
+    <script src="{% static 'assets/vendors/chartjs/Chart.min.js' %}"></script>
+    <script src="{% static 'assets/vendors/apexcharts/apexcharts.min.js' %}"></script>
+    <script src="{% static 'assets/js/pages/dashboard.js' %}"></script>
+    <script src="{% static 'assets/js/main.js' %}"></script>
+
+    <!-- Init Feather Icons -->
+    <script>
+        feather.replace();
+    </script>
+</body>
+</html>
