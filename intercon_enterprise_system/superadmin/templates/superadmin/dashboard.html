@@ -1,0 +1,46 @@
+{% extends 'superadmin/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Selamat datang, {{ request.user.first_name|default:request.user.username }}!</h2>
+    <p class="text-muted">Berikut ringkasan data sistem:</p>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-start border-primary border-4">
+                <div class="card-body">
+                    <h5 class="card-title">Data User</h5>
+                    <h3>{{ user_count }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-start border-success border-4">
+                <div class="card-body">
+                    <h5 class="card-title">Data Role</h5>
+                    <h3>{{ role_count }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-start border-warning border-4">
+                <div class="card-body">
+                    <h5 class="card-title">Data Menu</h5>
+                    <h3>{{ menu_count }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-start border-danger border-4">
+                <div class="card-body">
+                    <h5 class="card-title">Data Submenu</h5>
+                    <h3>{{ submenu_count }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h5 class="h5 text-gray-800"><strong>Sub Ledger Consolidation Search</strong></h5>
+    <hr>
+    <form method="post" id="myForm">
+        {% csrf_token %}
+        <div class="form-row mb-3">
+            <div class="col">
+                <input type="date" class="form-control" name="date_start" id="start" required>
+            </div>
+            <div class="col">
+                <input type="date" class="form-control" name="date_finish" id="finish" required>
+            </div>
+            <div class="col">
+                <select class="form-control" name="accountsub2_code" id="accountsub2_code" required>
+                    <option value="">Select Account</option>
+                    <option value="all">All Account</option>
+                    {% for acc in accountsub2 %}
+                        <option value="{{ acc.accountsub2_code }}">{{ acc.accountsub2_code }} - {{ acc.accountsub2_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-outline-primary" type="button" onclick="createExcel()">Create Excel</button>
+    </form>
+</div>
+
+<script>
+function createExcel() {
+    const acc = document.getElementById('accountsub2_code').value;
+    const start = document.getElementById('start').value;
+    const finish = document.getElementById('finish').value;
+
+    let url = "";
+    if (acc === "all") {
+        url = `/finance/excel/subledger/?accountsub2_code=all&date_start=${start}&date_finish=${finish}`;
+    } else {
+        url = `/finance/subledger/create/?accountsub2_code=${acc}&date_start=${start}&date_finish=${finish}`;
+    }
+    window.open(url, "_blank");
+}
+</script>
+{% endblock %}

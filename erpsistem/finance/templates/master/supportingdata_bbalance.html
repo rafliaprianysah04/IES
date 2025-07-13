@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid mb-2">
+    <h5 class="text-gray-800"><strong>{{ title }}</strong></h5>
+    <hr>
+
+         <!-- Add Data Button -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalAddBalance">
+                <i class="fas fa-plus-square"></i> Add Data
+            </button>
+        </div>
+       
+
+<!-- Recent Balances Table -->
+<hr>
+<h5 class="text-gray-800"><strong>Recent Add Beginning Balance</strong></h5>
+<hr>
+<div class="table-responsive-sm">
+    <table class="table table-hover table-sm table-bordered" id="myTables">
+        <thead class="thead-light text-center">
+            <tr>
+                <th>No</th><th>Code</th><th>Name</th><th>Branch ID</th><th>Date</th><th>Debit</th><th>Credit</th>
+            </tr>
+        </thead>
+        <tbody >
+            {% for row in bbalance %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ row.accountsub2code }}</td>
+                <td>{{ row.accountsub2_name }}</td>
+                <td>{{ row.branch_name }}</td>
+                <td>{{ row.inputdate }}</td>
+                <td>{{ row.debit|floatformat:2 }}</td>
+                <td>{{ row.credit|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+ <!-- Modal Add Data -->
+<div class="modal fade" id="modalAddBalance" tabindex="-1" aria-labelledby="modalAddBalanceLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <form method="post" action="{% url 'finance:add_bbalance' %}?token={{ token }}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Beginning Balance</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                   <!-- Tombol Add Row -->
+                    <div class="text-start mb-2">
+                        <button type="button" class="btn btn-sm btn-success" id="btnAddRow">
+                            <i class="fas fa-plus"></i> Add Row
+                        </button>
+                    </div>
+
+                    <div class="table-responsive-sm">
+                        <table class="table table-hover table-sm table-bordered" id="balance-table">
+                            <thead class="thead-light text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Branch</th>
+                                    <th>Debit</th>
+                                    <th>Credit</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="balance-body">
+                                {% for i in "12345" %}
+                                <tr>
+                                    <td class="text-center">{{ forloop.counter }}</td>
+                                    <td>
+                                        <select name="accountsub2code[]" class="form-select coa-select" required>
+                                            <option value="">Select Code</option>
+                                            {% for coa in all_coa %}
+                                            <option value="{{ coa.accountsub2_code }}" data-name="{{ coa.accountsub2_name }}">
+                                                {{ coa.accountsub2_code }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td><input type="text" readonly class="form-control coa-name" value=""></td>
+                                    <td>
+                                        <select name="branch_id[]" class="form-select" required>
+                                            <option value="">Select Branch</option>
+                                            {% for b in branch %}
+                                            <option value="{{ b.branch_id }}">{{ b.name_branch }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td><input type="text" name="debit[]" class="form-control text-end" value="0"></td>
+                                    <td><input type="text" name="credit[]" class="form-control text-end" value="0"></td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-danger btn-delete-row">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                    <!-- Template Baris Dinamis -->
+                    <template id="row-template">
+                        <tr>
+                            <td class="text-center"></td>
+                            <td>
+                                <select name="accountsub2code[]" class="form-select coa-select" required>
+                                    <option value="">Select Code</option>
+                                    {% for coa in all_coa %}
+                                    <option value="{{ coa.accountsub2_code }}" data-name="{{ coa.accountsub2_name }}">
+                                        {{ coa.accountsub2_code }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td><input type="text" readonly class="form-control coa-name" value=""></td>
+                            <td>
+                                <select name="branch_id[]" class="form-select" required>
+                                    <option value="">Select Branch</option>
+                                    {% for b in branch %}
+                                    <option value="{{ b.branch_id }}">{{ b.name_branch }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td><input type="text" name="debit[]" class="form-control text-end" value="0"></td>
+                            <td><input type="text" name="credit[]" class="form-control text-end" value="0"></td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-danger btn-delete-row">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        </template>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const addBtn = document.getElementById("btnAddRow");
+    const tableBody = document.getElementById("balance-body");
+    const template = document.getElementById("row-template");
+    const form = document.querySelector('#modalAddBalance form');
+    const submitBtn = document.querySelector('#modalAddBalance form button[type="submit"]'); 
+
+    
+
+    // Tambah baris baru
+    addBtn.addEventListener("click", function () {
+        const clone = template.content.cloneNode(true);
+        tableBody.appendChild(clone);
+        updateRowNumbers();
+    });
+
+    // Update nomor urut di kolom No
+    function updateRowNumbers() {
+        tableBody.querySelectorAll("tr").forEach((tr, index) => {
+            const noCell = tr.querySelector("td");
+            if (noCell) {
+                noCell.textContent = index + 1;
+            }
+        });
+    }
+
+    // Auto fill Name ketika Code dipilih
+    tableBody.addEventListener("change", function (e) {
+        if (e.target.classList.contains("coa-select")) {
+            const selectedOption = e.target.selectedOptions[0];
+            const name = selectedOption.getAttribute("data-name") || "";
+            const row = e.target.closest("tr");
+            const nameInput = row.querySelector(".coa-name");
+            if (nameInput) {
+                nameInput.value = name;
+            }
+        }
+    });
+
+    // Hapus baris ketika klik tombol delete
+    tableBody.addEventListener("click", function (e) {
+        if (e.target.closest('.btn-delete-row')) {
+            const row = e.target.closest('tr');
+            row.remove();
+            updateRowNumbers();
+        }
+    });
+       // Submit form via fetch
+    form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    // ✅ Cek semua branch terisi
+    const hasEmptyBranch = [...form.querySelectorAll('select[name="branch_id[]"]')].some(el => !el.value);
+    if (hasEmptyBranch) {
+        alert('Please select a branch for all rows.');
+        return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Data';
+
+        if (data.status) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalAddBalance'));
+            modal.hide();
+
+            // ✅ Gunakan token dari URL (bukan form.action)
+            const token = new URLSearchParams(window.location.search).get('token') || '';
+            window.location.href = window.location.pathname + '?token=' + token;
+        } else {
+            alert('Some fields are invalid:\n' + Object.values(data.errors).join('\n'));
+            console.error(data.errors);
+        }
+    })
+    .catch(error => {
+        console.error(error);
+        alert('Something went wrong while saving data.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Data';
+    });
+});
+
+    updateRowNumbers();
+}); 
+</script>
+{% endblock %}

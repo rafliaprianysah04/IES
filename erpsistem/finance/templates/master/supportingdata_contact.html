@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h5 class="h5 text-gray-800"><strong>{{ title }}</strong></h5>
+    <hr>
+    <div class="row">
+        <div class="col-sm">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="myTables" >
+                    <thead class="thead-light text-center my-auto">
+                        <tr>
+                            <th>No.</th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Active</th>
+                            <th>Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contact in contact_list %}
+                        <tr>
+                            <td class="text-center py-1">{{ forloop.counter }}</td>
+                            <td class="text-center py-1">{{ contact.contact_code }}</td>
+                            <td class="py-1">{{ contact.contact_name }}</td>
+                            <td class="py-1">{{ contact.email }}</td>
+                            <td class="py-1">{{ contact.phone }}</td>
+                            <td class="text-center py-1">
+                                {% if contact.is_active %}
+                                    Yes
+                                {% else %}
+                                    No
+                                {% endif %}
+                            </td>
+
+                            <td class="text-center">
+    <div class="d-inline-flex gap-1">
+        <button class="btn btn-outline-info btn-sm p-1" style="font-size: 0.65rem;" title="View">
+            <i class="fas fa-eye"></i>
+        </button>
+        <button class="btn btn-outline-danger btn-sm p-1" style="font-size: 0.65rem;" title="PDF">
+            <i class="fas fa-file-pdf"></i>
+        </button>
+        <button class="btn btn-outline-warning btn-sm p-1" style="font-size: 0.65rem;" title="Edit">
+            <i class="fas fa-edit"></i>
+        </button>
+    </div>
+</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No contact data available</td>
+                        </tr>
+                        {% endfor %}
+
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

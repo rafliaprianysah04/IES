@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static humanize%}
+{% block content %}
+<div class="container-fluid">
+    <h5 class="text-gray-800 mb-3"><strong>View Voucher</strong></h5>
+    <hr>
+
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <!-- Header Voucher Info -->
+            <div class="mb-3">
+                <div><span class="voucher-label">Date</span>: <span class="voucher-value">{{ reference.inputdate|date:"j F Y" }}</span></div>
+                <div><span class="voucher-label">Reference No.</span>: <span class="voucher-value">{{ reference.reference }}</span></div>
+                <div><span class="voucher-label">Description</span>: <span class="voucher-value">{{ reference.description }}</span></div>
+            </div>
+
+            <!-- Voucher Journal Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <thead class="text-center table-light align-middle">
+                        <tr>
+                            <th>Account Code - Name</th>
+                            <th>Branch</th>
+                            <th>Customer/Supplier/Employee</th>
+                            <th class="text-end">Debit</th>
+                            <th class="text-end">Credit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for j in journals %}
+                        <tr>
+                            <td>
+                                {% for acc in accountsub2 %}
+                                    {% if acc.accountsub2_code == j.coa_code %}
+                                        <input type="hidden" name="accountsub2_code[]" value="{{ acc.accountsub2_code }}">
+                                        <input type="text" class="form-control" value="{{ acc.accountsub2_code }} - {{ acc.accountsub2_name }}" readonly>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+
+                            <td>
+                                    {% for b in branch %}
+                                        {% if b.branch_id == j.branch_id %}
+                                            <input type="hidden" name="branch_id[]" value="{{ b.branch_id }}">
+                                            <input type="text" class="form-control" value="{{ b.name_branch }}" readonly>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            <td>
+                                {% if j.contact_name %}
+                                    {{ j.contact_name }}
+                                {% else %}
+                                    n/a
+                                {% endif %}
+                            </td>
+                            <td class="text-end">Rp. {{ j.debit|floatformat:0|intcomma }}</td>
+                            <td class="text-end">Rp. {{ j.credit|floatformat:0|intcomma }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Back Button -->
+            
+            <div class="text-end">
+                <a href="{% url 'finance:ledger' %}?token={{ token }}" class="btn btn-secondary">Back</a>
+                <a href="{% url 'finance:voucher_pdf' reference.reference_id %}?token={{ token }}" target="_blank" class="btn btn-danger">
+                    <i class="fas fa-file-pdf"></i> Print PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

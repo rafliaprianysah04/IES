@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h5><strong>{{ title }}</strong></h5>
+    <hr>
+
+    <div class="text-center mb-3">
+        <h6><strong>{{ selected_account_name }}</strong></h6>
+        <h6><strong>Account {{ selected_account }}</strong></h6>
+        <h6>Period: {{ selected_start|date:"d F Y" }} - {{ selected_finish|date:"d F Y" }}</h6>
+        <h6>Branch: {{ selected_branch_name }}</h6>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover" id="ledger">
+            <thead class="thead-light text-center">
+                <tr>
+                    <th>Date</th>
+                    <th>Reference</th>
+                    <th>Description</th>
+                    <th>Debit</th>
+                    <th>Credit</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="3"><strong>Beginning Balance</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td class="text-end"><strong>{{ beginning_balance|floatformat:2 }}</strong></td>
+                </tr>
+                {% for row in journals %}
+                <tr>
+                    <td>{{ row.inputdate|date:"d-m-Y" }}</td>
+                    <td>{{ row.reference }}</td>
+                    <td>{{ row.description|truncatechars:20 }}</td>
+                    <td class="text-end">{{ row.debit|floatformat:2 }}</td>
+                    <td class="text-end">{{ row.credit|floatformat:2 }}</td>
+                    <td class="text-end">{{ row.balance|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="bg-light fw-bold">
+                    <td colspan="3">Total</td>
+                    <td class="text-end">{{ total_debit|floatformat:2 }}</td>
+                    <td class="text-end">{{ total_credit|floatformat:2 }}</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h5 class="h5 text-gray-800"><strong>{{ title }}</strong></h5>
+    <hr>
+    <form method="post" id="ledgerForm">
+        {% csrf_token %}
+        <div class="form-row mb-3">
+            <div class="col">
+                <input type="date" class="form-control" name="date_start" id="start" value="{{ selected_start }}">
+            </div>
+            <div class="col">
+                <input type="date" class="form-control" name="date_finish" id="finish" value="{{ selected_finish }}">
+            </div>
+            <div class="col">
+                <select name="branch_id" class="form-control" id="branch_id">
+                    <option value="">Select Branch</option>
+                    {% for b in branch %}
+                        <option value="{{ b.branch_id }}" {% if b.branch_id == selected_branch %}selected{% endif %}>{{ b.name_branch }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col">
+                <select name="accountsub2_code" class="form-control" id="accountsub2_code">
+                    <option value="">Select Account</option>
+                    <option value="all" {% if selected_account == 'all' %}selected{% endif %}>All Account</option>
+                    {% for acc in accountsub2 %}
+                        <option value="{{ acc.accountsub2_code }}" {% if acc.accountsub2_code == selected_account %}selected{% endif %}>{{ acc.accountsub2_code }} - {{ acc.accountsub2_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+        <button class="btn btn-outline-primary" type="button" onclick="createExcel()">Create Excel</button>
+    </form>
+
+    {% if journals %}
+    <hr>
+    <div class="mt-4">
+        <h6 class="text-center"><strong>{{ selected_account_name }}</strong></h6>
+        <h6 class="text-center">Account: {{ selected_account }}</h6>
+        <h6>Period: {{ selected_start|date:"d F Y" }} - {{ selected_finish|date:"d F Y" }}</h6>
+        <h6>Branch: {{ selected_branch_name }}</h6>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="ledger">
+                <thead class="thead-light text-center">
+                    <tr>
+                        <th>Date</th>
+                        <th>Reference</th>
+                        <th>Description</th>
+                        <th>Debit</th>
+                        <th>Credit</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3"><strong>Beginning Balance</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td class="text-end"><strong>{{ beginning_balance|floatformat:2 }}</strong></td>
+                    </tr>
+                    {% for row in journals %}
+                    <tr>
+                        <td>{{ row.inputdate|date:"d-m-Y" }}</td>
+                        <td>{{ row.reference }}</td>
+                        <td>{{ row.description|truncatechars:20 }}</td>
+                        <td class="text-end">{{ row.debit|floatformat:2 }}</td>
+                        <td class="text-end">{{ row.credit|floatformat:2 }}</td>
+                        <td class="text-end">{{ row.balance|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="bg-light fw-bold">
+                        <td colspan="3">Total</td>
+                        <td class="text-end">{{ total_debit|floatformat:2 }}</td>
+                        <td class="text-end">{{ total_credit|floatformat:2 }}</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function createExcel() {
+    const start = document.getElementById('start').value;
+    const finish = document.getElementById('finish').value;
+    const branch_id = document.getElementById('branch_id').value;
+    const acc = document.getElementById('accountsub2_code').value;
+
+    const url = `/finance/excel/ledger/?accountsub2_code=${acc}&date_start=${start}&date_finish=${finish}&branch_id=${branch_id}`;
+    window.open(url, "_blank");
+}
+</script>
+{% endblock %}

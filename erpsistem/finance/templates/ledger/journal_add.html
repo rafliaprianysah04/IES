@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+    <h5 class="text-gray-800 mb-3"><strong>Add General Journal</strong></h5>
+    <hr>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="code" value="JV">
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <label><strong>Date</strong></label>
+                <input type="date" name="inputdate" class="form-control" value="{{ today|default:date:'Y-m-d' }}" required>
+            </div>
+            <div class="col-md-9">
+                <label><strong>Description</strong></label>
+                <input type="text" name="description" class="form-control" placeholder="Description" required>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="journal-table">
+                <thead class="table-light text-center">
+                    <tr>
+                        <th># - Account</th>
+                        <th>Branch</th>
+                        <th>Cust./Supp./Empl.</th>
+                        <th>Debit</th>
+                        <th>Credit</th>
+                        <th><button type="button" class="btn btn-success btn-sm" id="add-row"><i class="fas fa-plus"></i></button></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select name="accountsub2_code[]" class="form-control select2" required>
+                                <option value="">Select</option>
+                                {% for acc in accountsub2 %}
+                                    <option value="{{ acc.accountsub2_code }}">{{ acc.accountsub2_code }} - {{ acc.accountsub2_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <select name="branch_id[]" class="form-control select2">
+                                <option value="">Select</option>
+                                {% for b in branch %}
+                                    <option value="{{ b.branch_id }}">{{ b.name_branch }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <select name="contact_code[]" class="form-control select2" required>
+                                <option value="">Select</option>
+                                {% for c in contact %}
+                                    <option value="{{ c.contact_id }}">{{ c.names }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><input type="text" name="debit[]" class="form-control text-end money debit" value="0.00"></td>
+                        <td><input type="text" name="credit[]" class="form-control text-end money credit" value="0.00"></td>
+                        <td><button type="button" class="btn btn-danger btn-sm remove"><i class="fas fa-minus"></i></button></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Total</strong></td>
+                        <td><input type="text" class="form-control text-end" id="total-debit" readonly></td>
+                        <td><input type="text" class="form-control text-end" id="total-credit" readonly></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Discrepancy</strong></td>
+                        <td colspan="2"><input type="text" class="form-control bg-warning text-end" id="discrepancy" readonly></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="text-end">
+            <a href="{% url 'finance:ledger' %}?token={{ token }}" class="btn btn-secondary">Close</a>
+            <button type="submit" class="btn btn-primary">Add Journal</button>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function recalculate() {
+            let totalDebit = 0, totalCredit = 0;
+
+            document.querySelectorAll('.debit').forEach(input => {
+                totalDebit += parseFloat(input.value.replace(/,/g, '')) || 0;
+            });
+
+            document.querySelectorAll('.credit').forEach(input => {
+                totalCredit += parseFloat(input.value.replace(/,/g, '')) || 0;
+            });
+
+            document.getElementById('total-debit').value = totalDebit.toFixed(2);
+            document.getElementById('total-credit').value = totalCredit.toFixed(2);
+            document.getElementById('discrepancy').value = (totalDebit - totalCredit).toFixed(2);
+        }
+
+        document.getElementById('journal-table').addEventListener('input', recalculate);
+
+        document.getElementById('add-row').addEventListener('click', function() {
+            let row = document.querySelector('#journal-table tbody tr').cloneNode(true);
+            row.querySelectorAll('input').forEach(input => input.value = '0.00');
+            row.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+            document.querySelector('#journal-table tbody').appendChild(row);
+        });
+
+        document.getElementById('journal-table').addEventListener('click', function(e) {
+            if (e.target.closest('.remove')) {
+                if (document.querySelectorAll('#journal-table tbody tr').length > 1) {
+                    e.target.closest('tr').remove();
+                    recalculate();
+                }
+            }
+        });
+
+        recalculate();
+    });
+</script>
+{% endblock %}

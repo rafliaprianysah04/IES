@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static humanize %}
+{% block content %}
+<div id="app">
+    <div class="sales-remaining-all">
+        <div class="kiri">
+            <div class="action mb-3">
+                <p>Total Debit : Rp {{ total_debit|floatformat:2|intcomma }}</p>
+
+                <input type="text" id="searchInput" placeholder="Search by Reference, Debit, Customer, or Branch">
+                <select id="branchFilter">
+                    <option value="">Select Branch</option>
+                    {% for b in per_branch %}
+                        <option value="{{ b }}">{{ b }}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="customerFilter">
+                    <option value="">Select Customer</option>
+                    {% for cust in per_customer %}
+                        <option value="{{ cust }}">{{ cust }}</option>
+                    {% endfor %}
+                </select>
+
+                <input type="date" id="minDate">
+                <input type="date" id="maxDate">
+            </div>
+
+            <table class="table" id="myTables">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>No</th>
+                        <th>Input Date</th>
+                        <th>Reference</th>
+                        <th>Debit</th>
+                        <th>Customer</th>
+                        <th>Branch</th>
+                        <th>Created By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for idx, item in combined_data|dictsortreversed:"inputdate" %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.inputdate }}</td>
+                        <td>{{ item.reference }}</td>
+                        <td>Rp {{ item.debit|floatformat:2|intcomma }}</td>
+                        <td>{{ item.contact_alias }}</td>
+                        <td>{{ item.branch }}</td>
+                        <td>{{ item.name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="kanan">
+            <div class="wrap-customer mb-4">
+                <p>Remaining Sales Invoice Per-Customer</p>
+                <table>
+                    {% for name, amount in per_customer.items %}
+                    <tr>
+                        <td style="width: 200px;">{{ name }}</td>
+                        <td style="width: 10px;">:</td>
+                        <td>Rp {{ amount|floatformat:2|intcomma }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <div class="wrap-branch">
+                <p>Remaining Sales Invoice Per-Branch</p>
+                <table>
+                    {% for name, amount in per_branch.items %}
+                    <tr>
+                        <td style="width: 200px;">{{ name }}</td>
+                        <td style="width: 10px;">:</td>
+                        <td>Rp {{ amount|floatformat:2|intcomma }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

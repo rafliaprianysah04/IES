@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Chart Of Account</h2>
+        <div class="row">
+        <div class="col-md-3">
+           <a href="{% url 'finance:account_list' %}?token={{ token }}" class="text-decoration-none text-dark">
+            <div class="card shadow-sm border-start border-primary border-4">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i data-feather="bar-chart-2" class="text-primary" style="width:32px;height:32px;"></i>
+                    </div>
+                    <h5 class="card-title">Account</h5>
+                    <h3></h3>
+                </div>
+              </a>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+           <a href="{% url 'finance:account1_list' %}?token={{ token }}" class="text-decoration-none text-dark">
+            <div class="card shadow-sm border-start border-success border-4">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i data-feather="users" class="text-success" style="width:32px;height:32px;"></i>
+                    </div>
+                    <h5 class="card-title">Account One</h5>
+                    <h3></h3>
+                </div>
+              </a>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+           <a href="{% url 'finance:account2_list' %}?token={{ token }}" class="text-decoration-none text-dark">
+            <div class="card shadow-sm border-start border-warning border-4">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i data-feather="bell" class="text-warning" style="width:32px;height:32px;"></i>
+                    </div>
+                    <h5 class="card-title">Account Two</h5>
+                    <h3></h3>
+                </div>
+              </a>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+           <a href="{% url 'finance:accountsub1_list' %}?token={{ token }}" class="text-decoration-none text-dark">
+            <div class="card shadow-sm border-start border-danger border-4">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i data-feather="activity" class="text-danger" style="width:32px;height:32px;"></i>
+                    </div>
+                    <h5 class="card-title">Sub Account One</h5>
+                    <h3></h3>
+                </div>
+            </div>
+        </div>
+      </a>
+    </div>
+        <div class="col-md-3">
+           <a href="{% url 'finance:accountsub2_list' %}?token={{ token }}" class="text-decoration-none text-dark">
+            <div class="card shadow-sm border-start border-danger border-4">
+                <div class="card-body text-center">
+                    <div class="mb-2">
+                        <i data-feather="activity" class="text-danger" style="width:32px;height:32px;"></i>
+                    </div>
+                    <h5 class="card-title">Sub Account Two</h5>
+                    <h3></h3>
+                </div>
+            </div>
+        </div>
+      </a>
+    </div>
+</div>
+</div>
+{% endblock %}

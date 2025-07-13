@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Supporting Data</h2>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <a href="{% url 'finance:supportingdata_branch' %}?token={{ token }}" class="text-decoration-none text-dark">
+                <div class="card shadow-sm border-start border-primary border-4">
+                    <div class="card-body text-center">
+                        <div class="mb-2">
+                            <i data-feather="bar-chart-2" class="text-primary" style="width:32px;height:32px;"></i>
+                        </div>
+                        <h5 class="card-title">Branch</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <a href="{% url 'finance:supportingdata_employee' %}?token={{ token }}" class="text-decoration-none text-dark">
+                <div class="card shadow-sm border-start border-success border-4">
+                    <div class="card-body text-center">
+                        <div class="mb-2">
+                            <i data-feather="users" class="text-success" style="width:32px;height:32px;"></i>
+                        </div>
+                        <h5 class="card-title">Employee</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <a href="{% url 'finance:supportingdata_contact' %}?token={{ token }}" class="text-decoration-none text-dark">
+                <div class="card shadow-sm border-start border-warning border-4">
+                    <div class="card-body text-center">
+                        <div class="mb-2">
+                            <i data-feather="image" class="text-warning" style="width:32px;height:32px;"></i>
+                        </div>
+                        <h5 class="card-title">Consignee</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <a href="{% url 'finance:supportingdata_uom' %}?token={{ token }}" class="text-decoration-none text-dark">
+                <div class="card shadow-sm border-start border-danger border-4">
+                    <div class="card-body text-center">
+                        <div class="mb-2">
+                            <i data-feather="activity" class="text-danger" style="width:32px;height:32px;"></i>
+                        </div>
+                        <h5 class="card-title">Unit Of Measurement</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <a href="{% url 'finance:supportingdata_warehouse' %}?token={{ token }}" class="text-decoration-none text-dark">
+                <div class="card shadow-sm border-start border-primary border-4">
+                    <div class="card-body text-center">
+                        <div class="mb-2">
+                            <i data-feather="bar-chart-2" class="text-primary" style="width:32px;height:32px;"></i>
+                        </div>
+                        <h5 class="card-title">Warehouse</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <a href="{% url 'finance:beginning_balance' %}?token={{ token }}" class="text-decoration-none text-dark">
+                <div class="card shadow-sm border-start border-primary border-4">
+                    <div class="card-body text-center">
+                        <div class="mb-2">
+                            <i data-feather="bar-chart-2" class="text-primary" style="width:32px;height:32px;"></i>
+                        </div>
+                        <h5 class="card-title">Begining Balance</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <a href="{% url 'finance:supportingdata_tax' %}?token={{ token }}" class="text-decoration-none text-dark">
+                <div class="card shadow-sm border-start border-primary border-4">
+                    <div class="card-body text-center">
+                        <div class="mb-2">
+                            <i data-feather="bar-chart-2" class="text-primary" style="width:32px;height:32px;"></i>
+                        </div>
+                        <h5 class="card-title">TAX</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

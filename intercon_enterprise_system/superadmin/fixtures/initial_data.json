@@ -1,0 +1,7 @@
+
+[
+    {"model": "superadmin.role", "pk": 1, "fields": {"nama_role": "superadmin", "is_active": true}},
+    {"model": "superadmin.role", "pk": 2, "fields": {"nama_role": "administrator", "is_active": true}},
+    {"model": "superadmin.role", "pk": 3, "fields": {"nama_role": "pic", "is_active": true}},
+    {"model": "superadmin.role", "pk": 4, "fields": {"nama_role": "staff", "is_active": true}}
+]

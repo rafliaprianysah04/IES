@@ -1,0 +1,152 @@
+{% extends 'superadmin/base.html' %}
+{% block content %}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Tabel Data Role -->
+        <div class="col-md-7 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">Data Role</div>
+                <div class="card-body mt-2">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="roleTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nama Role</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="roleData">
+                                <!-- data akan dimuat dengan AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Input Role -->
+        <div class="col-md-5 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">Form Input Role</div>
+                <div class="card-body mt-2">
+                    <form id="roleForm">
+                        <input type="hidden" id="role_id">
+                        <div class="mb-2">
+                            <label>Nama Role</label>
+                            <input type="text" id="nama_role" class="form-control" required>
+                        </div>
+                        <div class="mb-2">
+                            <label>Status</label><br>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="is_active" checked>
+                                <label class="form-check-label">Aktif</label>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-success">Simpan</button>
+                            <button type="reset" class="btn btn-secondary" id="resetBtn">Reset</button>
+                        </div>
+                    </form>
+                    <div id="notif" class="mt-2 text-success d-none"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const roleApi = "{% url 'superadmin:role_api' %}";
+
+    function loadRoles() {
+        fetch(roleApi)
+            .then(res => res.json())
+            .then(data => {
+                let rows = '';
+                data.data.forEach((r, i) => {
+                    rows += `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${r.nama_role}</td>
+                            <td>${r.is_active ? 'Aktif' : 'Tidak Aktif'}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick='editRole(${JSON.stringify(r).replace(/"/g, "&quot;")})'>Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteRole(${r.id})">Hapus</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                const table = $('#roleTable').DataTable();
+                table.clear().destroy();
+                document.getElementById('roleData').innerHTML = rows;
+                $('#roleTable').DataTable();
+            });
+    }
+
+    function showNotif(msg, color = 'success') {
+        const notif = document.getElementById('notif');
+        notif.className = `mt-2 text-${color}`;
+        notif.textContent = msg;
+        notif.classList.remove('d-none');
+        setTimeout(() => notif.classList.add('d-none'), 3000);
+    }
+
+    document.getElementById('roleForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const nama = document.getElementById('nama_role').value.trim();
+        if (!nama) {
+            showNotif('Nama Role tidak boleh kosong.', 'danger');
+            return;
+        }
+
+        const payload = {
+            id: document.getElementById('role_id').value || null,
+            nama_role: nama,
+            is_active: document.getElementById('is_active').checked
+        };
+
+        fetch(roleApi, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            showNotif(data.status === 'created' ? 'Role ditambahkan' : 'Role diperbarui');
+            document.getElementById('roleForm').reset();
+            document.getElementById('role_id').value = '';
+            loadRoles();
+        });
+    });
+
+    function editRole(data) {
+        document.getElementById('role_id').value = data.id;
+        document.getElementById('nama_role').value = data.nama_role;
+        document.getElementById('is_active').checked = data.is_active;
+    }
+
+    function deleteRole(id) {
+        if (!confirm('Yakin ingin menghapus role ini?')) return;
+        fetch(roleApi, {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id})
+        })
+        .then(res => res.json())
+        .then(() => {
+            showNotif('Role berhasil dihapus');
+            loadRoles();
+        });
+    }
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        document.getElementById('role_id').value = '';
+    });
+
+    loadRoles();
+</script>
+
+{% endblock %}

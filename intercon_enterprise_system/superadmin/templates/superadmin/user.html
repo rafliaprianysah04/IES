@@ -1,0 +1,126 @@
+{% extends 'superadmin/base.html' %}
+{% block content %}
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12 md-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">Data User</div>
+                <div class="card-body mt-2">
+                    <div class="table-responsive">
+                        <table class="table table-striped w-100" id="userTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nama</th>
+                                    <th>Email</th>
+                                    <th>App</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Akan diisi oleh DataTables -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery + DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    const userApi = "{% url 'superadmin:user_api' %}";
+    let table;
+
+    $(document).ready(function () {
+        table = $('#userTable').DataTable({
+            pageLength: 10,
+            lengthChange: false,
+            searching: true,
+            ordering: true,
+            responsive: true,
+            columns: [
+                { title: "#" },
+                { title: "Nama" },
+                { title: "Email" },
+                { title: "App" },
+                { title: "Role" },
+                { title: "Status" },
+                { title: "Aksi", orderable: false }
+            ]
+        });
+
+        loadUsers();
+    });
+
+    function loadUsers() {
+        fetch(userApi)
+            .then(res => res.json())
+            .then(data => {
+                table.clear().draw();
+                data.data.forEach((u, i) => {
+                    const statusText = u.is_active ? 'Aktif' : 'Tidak Aktif';
+                    const btnClass = u.is_active ? 'btn-danger' : 'btn-success';
+                    const btnText = u.is_active ? 'Nonaktifkan' : 'Aktifkan';
+
+                    table.row.add([
+                        i + 1,
+                        `${u.first_name || ''} ${u.last_name || ''}`,
+                        u.email,
+                        u.app_id,
+                        u.role_id,
+                        statusText,
+                        `<button class="btn btn-sm ${btnClass}" onclick="toggleStatus(${u.id}, ${!u.is_active})">${btnText}</button>`
+                    ]);
+                });
+                table.draw();
+            });
+    }
+
+    function toggleStatus(id, newStatus) {
+        const action = newStatus ? 'mengaktifkan' : 'menonaktifkan';
+        if (!confirm(`Yakin ingin ${action} user ini?`)) return;
+
+        fetch(userApi, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, is_active: newStatus })
+        })
+        .then(res => res.json())
+        .then(data => {
+            showNotif('Status user berhasil diperbarui');
+            loadUsers();
+        })
+        .catch(err => {
+            console.error(err);
+            showNotif('Terjadi kesalahan saat mengubah status user', 'danger');
+        });
+    }
+
+    function showNotif(msg, color='success') {
+        let notif = document.getElementById('notif');
+        if (!notif) {
+            notif = document.createElement('div');
+            notif.id = 'notif';
+            notif.className = `mt-3 text-${color}`;
+            document.querySelector('.card-body').prepend(notif);
+        }
+        notif.className = `mt-3 text-${color}`;
+        notif.textContent = msg;
+        notif.classList.remove('d-none');
+        setTimeout(() => notif.classList.add('d-none'), 3000);
+    }
+</script>
+
+{% endblock %}

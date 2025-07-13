@@ -1,0 +1,193 @@
+{% extends 'superadmin/base.html' %}
+{% block content %}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Tabel SubMenu -->
+        <div class="col-md-7">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">Data Submenu</div>
+                <div class="card-body mt-2">
+                    <div class="table-responsive">
+                        <table class="table" id="submenuTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Menu Induk</th>
+                                    <th>Submenu</th>
+                                    <th>URL</th>
+                                    <th>Ikon</th>
+                                    <th>Sort</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="submenuData">
+                                <!-- diisi oleh JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Submenu -->
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">Form Submenu</div>
+                <div class="card-body mt-2">
+                    <form id="submenuForm">
+                        <input type="hidden" id="submenu_id">
+                        <div class="mb-2">
+                            <label>Menu Induk</label>
+                            <select id="menu_id" class="form-select" required>
+                                <option value="">-- Pilih Menu --</option>
+                                {% for m in menus %}
+                                <option value="{{ m.id }}">{{ m.nama_menu }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label>Nama Submenu</label>
+                            <input type="text" id="name_submenu" class="form-control" placeholder="Nama Submenu" required>
+                        </div>
+                        <div class="mb-2">
+                            <label>URL</label>
+                            <input type="text" id="urls" class="form-control" placeholder="/path/submenu" required>
+                        </div>
+                        <div class="mb-2">
+                            <label>Ikon Submenu</label>
+                            <input type="text" id="icon_submenu" class="form-control">
+                        </div>
+                        <div class="mb-2">
+                            <label>Sort (Urutan)</label>
+                            <input type="number" id="sort" class="form-control" min="1" required>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-success">Simpan</button>
+                            <button type="reset" class="btn btn-secondary" id="resetBtn">Reset</button>
+                        </div>
+                    </form>
+                    <div id="notif" class="mt-2 text-success d-none"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const submenuApi = "{% url 'superadmin:submenu_api' %}";
+    let submenuTable;
+
+    const menuMap = {};
+    {% for m in menus %}
+        menuMap[{{ m.id }}] = "{{ m.nama_menu }}";
+    {% endfor %}
+
+    function loadSubmenus() {
+        fetch(submenuApi)
+            .then(res => res.json())
+            .then(data => {
+                // Hapus DataTable jika sudah terinisialisasi
+                if ($.fn.dataTable.isDataTable('#submenuTable')) {
+                    submenuTable.clear().destroy();
+                }
+
+                let html = '';
+                data.data.forEach((s, i) => {
+                    html += `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${menuMap[s.menu_id] || '-'}</td>
+                            <td>${s.nama_submenu}</td>
+                            <td>${s.urls}</td>
+                            <td><i class="${s.icon_submenu}"></i> ${s.icon_submenu}</td>
+                            <td>${s.sort}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick='editSubmenu(${JSON.stringify(s).replace(/"/g, "&quot;")})'>Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteSubmenu(${s.id})">Hapus</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                document.getElementById('submenuData').innerHTML = html;
+                submenuTable = new DataTable('#submenuTable');
+            });
+    }
+
+    function showNotif(msg, color = 'success') {
+        const notif = document.getElementById('notif');
+        notif.className = `mt-2 text-${color}`;
+        notif.textContent = msg;
+        notif.classList.remove('d-none');
+        setTimeout(() => notif.classList.add('d-none'), 3000);
+    }
+
+    document.getElementById('submenuForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const menuId = document.getElementById('menu_id').value;
+        const name_submenuId = document.getElementById('name_submenu').value;
+        const urls = document.getElementById('urls').value.trim();
+        const icon = document.getElementById('icon_submenu').value.trim();
+        const sort = document.getElementById('sort').value.trim();
+
+        if (!menuId || !urls || !icon || !sort) {
+            showNotif('Semua kolom wajib diisi.', 'danger');
+            return;
+        }
+
+        const payload = {
+            id: document.getElementById('submenu_id').value || null,
+            menu_id: menuId,
+            name_submenu: name_submenuId,
+            urls: urls,
+            icon_submenu: icon,
+            sort: sort
+        };
+
+        fetch(submenuApi, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            showNotif(data.status === 'created' ? 'Submenu ditambahkan' : 'Submenu diperbarui');
+            loadSubmenus();
+            document.getElementById('submenuForm').reset();
+            document.getElementById('submenu_id').value = '';
+        });
+    });
+
+    function editSubmenu(data) {
+        document.getElementById('submenu_id').value = data.id;
+        document.getElementById('name_submenu').value = data.nama_submenu;
+        document.getElementById('menu_id').value = data.menu_id;
+        document.getElementById('urls').value = data.urls;
+        document.getElementById('icon_submenu').value = data.icon_submenu;
+        document.getElementById('sort').value = data.sort;
+    }
+
+    function deleteSubmenu(id) {
+        if (!confirm('Yakin ingin menghapus submenu ini?')) return;
+        fetch(submenuApi, {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id})
+        })
+        .then(res => res.json())
+        .then(() => {
+            showNotif('Submenu berhasil dihapus');
+            loadSubmenus();
+        });
+    }
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        document.getElementById('submenu_id').value = '';
+    });
+
+    document.addEventListener('DOMContentLoaded', loadSubmenus);
+</script>
+
+{% endblock %}

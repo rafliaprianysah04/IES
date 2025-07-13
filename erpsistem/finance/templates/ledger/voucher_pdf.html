@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #000; padding: 5px; }
+        th { background-color: #eee; }
+        .text-end { text-align: right; }
+    </style>
+</head>
+<body>
+    <h3>Voucher</h3>
+    <p><strong>Date:</strong> {{ reference.inputdate|date:"Y-m-d" }}</p>
+    <p><strong>Reference No.:</strong> {{ reference.reference }}</p>
+    <p><strong>Description:</strong> {{ reference.description }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th># - Account</th>
+                <th>Branch</th>
+                <th>Customer / Supplier</th>
+                <th class="text-end">Debit</th>
+                <th class="text-end">Credit</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for j in journals %}
+            <tr>
+                <td>
+                    {{ j.coa_code }}
+                    {% for acc in accountsub2 %}
+                        {% if acc.accountsub2_code == j.coa_code %}
+                            - {{ acc.accountsub2_name }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for b in branch %}
+                        {% if b.branch_id == j.branch_id %}
+                            {{ b.name_branch }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for c in contact %}
+                        {% if c.contact_id == j.contact_code %}
+                            {{ c.names }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td class="text-end">{{ j.debit|floatformat:2 }}</td>
+                <td class="text-end">{{ j.credit|floatformat:2 }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3"><strong>Total</strong></td>
+                <td class="text-end"><strong>{{ total_debit|floatformat:2 }}</strong></td>
+                <td class="text-end"><strong>{{ total_credit|floatformat:2 }}</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<div class="container-fluid mb-3">
+    <h5 class="text-gray-800"><strong>Purchase Invoice</strong></h5>
+    <hr>
+
+    <div class="row">
+        <div class="col-lg">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-plus-square"></i> Add Data</a>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-3">
+                    <div class="table-responsive">
+                       <table class="table table-bordered table-hover" id="myTables">
+                            <thead class="thead-light text-center bg-light">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Date</th>
+                                    <th>Reference</th>
+                                    <th>Description</th>
+                                    <th>Value</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in data %}
+                                <tr class="text-center">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ item.ref.inputdate|date:"Y-m-d" }}</td>
+                                    <td>{{ item.ref.reference }}</td>
+                                    <td class="text-left">{{ item.ref.description }}</td>
+                                    <td class="text-right">{{ item.total }}</td>
+                                    <td>
+                                        {% if item.status == 1 %}
+                                            <span class="badge py-0 px-1 bg-success">A</span>
+                                        {% elif item.status == 0 %}
+                                            <span class="badge py-0 px-1 bg-warning">P</span>
+                                        {% else %}
+                                            <span class="badge py-0 px-1 bg-secondary">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+    <div class="d-inline-flex gap-1">
+        <button class="btn btn-outline-info btn-sm p-1" style="font-size: 0.65rem;" title="View">
+            <i class="fas fa-eye"></i>
+        </button>
+        <button class="btn btn-outline-danger btn-sm p-1" style="font-size: 0.65rem;" title="PDF">
+            <i class="fas fa-file-pdf"></i>
+        </button>
+        <button class="btn btn-outline-warning btn-sm p-1" style="font-size: 0.65rem;" title="Edit">
+            <i class="fas fa-edit"></i>
+        </button>
+    </div>
+</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No data available.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

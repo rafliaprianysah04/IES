@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Kode OTP Verifikasi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f6f9fc;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            background-color: #ffffff;
+            max-width: 600px;
+            margin: 30px auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 30px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .logo img {
+            height: 50px;
+        }
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            color: #2c3e50;
+        }
+        .message {
+            margin-top: 25px;
+            font-size: 16px;
+            color: #333333;
+        }
+        .otp-box {
+            background-color: #eef4fb;
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+            letter-spacing: 4px;
+        }
+        .footer {
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="title">Kode OTP Verifikasi Akun Anda</div>
+        <div class="message">
+            Halo, berikut adalah kode OTP untuk memverifikasi akun Anda:
+        </div>
+        <div class="otp-box">{{ otp_code }}</div>
+        <div class="message">
+            Kode ini berlaku selama <strong>10 menit</strong>. Jangan bagikan kode ini kepada siapa pun.
+        </div>
+        <div class="footer">
+            © {{ year }} Intercon Terminal. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

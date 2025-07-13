@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+    <h5 class="text-gray-800 mb-3"><strong>Edit General Journal</strong></h5>
+    <hr>
+    {% if ref.status == 0 or ref.status == 4 %}
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="reference_id" value="{{ reference.reference_id }}">
+        <input type="hidden" name="code" value="{{ reference.code }}">
+        <input type="hidden" name="created_by" value="{{ reference.created_by }}">
+        <input type="hidden" name="date_created" value="{{ reference.date_created|date:'Y-m-d H:i:s' }}">
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label><strong>Date</strong></label>
+                        <input type="date" name="inputdate" class="form-control" value="{{ reference.inputdate|date:'Y-m-d' }}" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label><strong>Reference No.</strong></label>
+                        <input type="text" name="reference" class="form-control" value="{{ reference.reference }}" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label><strong>Description</strong></label>
+                        <input type="text" name="description" class="form-control" value="{{ reference.description }}" required>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered addTable2">
+                        <thead class="text-center table-light">
+                            <tr>
+                                <th># - Account</th>
+                                <th>Branch</th>
+                                <th>Cust./Supp./Empl.</th>
+                                <th>Debit</th>
+                                <th>Credit</th>
+                                <th><button type="button" name="add" class="btn btn-success btn-sm add2"><i class="fas fa-plus"></i></button></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for j in journals %}
+                            <tr>
+                                <input type="hidden" name="journal_id[]" value="{{ j.journal_id }}">
+                                <td>
+                                    <select name="accountsub2_code[]" class="form-control select2" required>
+                                        {% for acc in accountsub2 %}
+                                            {% with code=acc.accountsub2_code %}
+                                                <option value="{{ code }}" {% if code == j.coa_code %}selected{% endif %}>
+                                                    {{ code }} - {{ acc.accountsub2_name }}
+                                                </option>
+                                            {% endwith %}
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td>
+                                    {% for b in branch %}
+                                        {% if b.branch_id == j.branch_id %}
+                                            <input type="hidden" name="branch_id[]" value="{{ b.branch_id }}">
+                                            <input type="text" class="form-control" value="{{ b.name_branch }}" readonly>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                               <td>
+                                    <select name="contact_code[]" class="form-control select2" required>
+                                        {% if contact|length > 0 %}
+                                            {% for c in contact %}
+                                                <option value="{{ c.contact_id }}" {% if c.contact_id == j.contact_code %}selected{% endif %}>{{ c.names }}</option>
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="" selected>N/A</option>
+                                        {% endif %}
+                                    </select>
+                                </td>
+                                <td><input type="text" name="debit[]" class="form-control text-end money debit1" value="{{ j.debit|floatformat:2 }}"></td>
+                                <td><input type="text" name="credit[]" class="form-control text-end money credit1" value="{{ j.credit|floatformat:2 }}"></td>
+                                <td><button type="button" name="remove" class="btn btn-danger btn-sm remove"><i class="fas fa-minus"></i></button></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total</strong></td>
+                                <td><span class="form-control text-end ttotaldbt">0.00</span></td>
+                                <td><span class="form-control text-end ttotalcrt">0.00</span></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Discrepancy</strong></td>
+                                <td colspan="2"><span class="form-control text-end discrepancy1 bg-warning">0.00</span></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="text-end">
+                    <a href="{% url 'finance:ledger' %}?token={{ token }}" class="btn btn-secondary">Close</a>
+                    <button type="submit" class="btn btn-primary">Edit Journal</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    {% else %}
+    <div class="card border-danger">
+        <div class="card-body">
+            <h5 class="card-title text-danger"><b>WARNING!</b></h5>
+            <p class="card-text">Reference {{ reference.reference }} has been approved or rejected and cannot be edited.</p>
+            <a href="{% url 'finance:ledger' %}?token={{ token }}" class="btn btn-secondary">Close</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Optional JS to auto calculate total debit/credit/discrepancy -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function updateTotals() {
+            let debit = 0, credit = 0;
+            document.querySelectorAll('.debit1').forEach(el => debit += parseFloat(el.value.replace(/,/g, '') || 0));
+            document.querySelectorAll('.credit1').forEach(el => credit += parseFloat(el.value.replace(/,/g, '') || 0));
+            document.querySelector('.ttotaldbt').textContent = debit.toFixed(2);
+            document.querySelector('.ttotalcrt').textContent = credit.toFixed(2);
+            document.querySelector('.discrepancy1').textContent = (debit - credit).toFixed(2);
+        }
+        document.querySelectorAll('.debit1, .credit1').forEach(el => {
+            el.addEventListener('input', updateTotals);
+        });
+        updateTotals();
+    });
+</script>
+{% endblock %}

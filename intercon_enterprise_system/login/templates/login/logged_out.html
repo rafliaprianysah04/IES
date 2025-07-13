@@ -1,0 +1,23 @@
+{% extends 'login/base.html' %}
+{% load static %}
+
+{% block title %}Logout Berhasil{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg p-4 p-md-5 border-0 rounded-3 text-center">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4 fw-bold text-dark">Logout Berhasil</h2>
+                <p class="card-text text-center text-muted mb-5">Anda telah berhasil keluar dari sistem.</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'login:login' %}" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                        Login Kembali
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

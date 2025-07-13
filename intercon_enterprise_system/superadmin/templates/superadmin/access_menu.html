@@ -1,0 +1,177 @@
+{% extends 'superadmin/base.html' %}
+{% block content %}
+
+<!-- Tambahkan DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Tabel Akses Menu -->
+        <div class="col-md-7">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">Data Akses Menu</div>
+                <div class="card-body mt-2">
+                    <div class="table-responsive">
+                        <table class="table" id="accessMenuTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Role</th>
+                                    <th>Menu</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="accessData">
+                                <!-- Diisi via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>  
+            </div>
+        </div>
+
+        <!-- Form Akses Menu -->
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">Form Akses Menu</div>
+                <div class="card-body mt-2">
+                    <form id="accessForm">
+                        <input type="hidden" id="access_id">
+                        <div class="mb-2">
+                            <label>Role</label>
+                            <select id="role_id" class="form-select" required>
+                                <option value="">-- Pilih Role --</option>
+                                {% for r in roles %}
+                                <option value="{{ r.id }}">{{ r.nama_role }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label>Menu</label>
+                            <select id="menu_id" class="form-select" required>
+                                <option value="">-- Pilih Menu --</option>
+                                {% for m in menus %}
+                                <option value="{{ m.id }}">{{ m.nama_menu }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-success">Simpan</button>
+                            <button type="reset" class="btn btn-secondary" id="resetBtn">Reset</button>
+                        </div>
+                    </form>
+                    <div id="notif" class="mt-2 text-success d-none"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const accessApi = "{% url 'superadmin:access_menu_api' %}";
+    const roleMap = {};
+    const menuMap = {};
+    {% for r in roles %}
+        roleMap[{{ r.id }}] = "{{ r.nama_role }}";
+    {% endfor %}
+    {% for m in menus %}
+        menuMap[{{ m.id }}] = "{{ m.nama_menu }}";
+    {% endfor %}
+
+    let accessTable;
+
+    function loadAccess() {
+        fetch(accessApi)
+            .then(res => res.json())
+            .then(data => {
+                if ($.fn.dataTable.isDataTable('#accessMenuTable')) {
+                    accessTable.clear().destroy();
+                }
+
+                let html = '';
+                data.data.forEach((a, i) => {
+                    html += `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${roleMap[a.role_id]}</td>
+                            <td>${menuMap[a.menu_id]}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick='editAccess(${JSON.stringify(a).replace(/"/g, "&quot;")})'>Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteAccess(${a.id})">Hapus</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                document.getElementById('accessData').innerHTML = html;
+                accessTable = new DataTable('#accessMenuTable');
+            });
+    }
+
+    function showNotif(msg, color = 'success') {
+        const notif = document.getElementById('notif');
+        notif.className = `mt-2 text-${color}`;
+        notif.textContent = msg;
+        notif.classList.remove('d-none');
+        setTimeout(() => notif.classList.add('d-none'), 3000);
+    }
+
+    document.getElementById('accessForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const roleId = document.getElementById('role_id').value.trim();
+        const menuId = document.getElementById('menu_id').value.trim();
+
+        if (!roleId || !menuId) {
+            showNotif('Role dan Menu wajib dipilih.', 'danger');
+            return;
+        }
+
+        const payload = {
+            id: document.getElementById('access_id').value || null,
+            role_id: roleId,
+            menu_id: menuId
+        };
+
+        fetch(accessApi, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            showNotif(data.status === 'created' ? 'Akses ditambahkan' : 'Akses diperbarui');
+            loadAccess();
+            document.getElementById('accessForm').reset();
+            document.getElementById('access_id').value = '';
+        });
+    });
+
+    function editAccess(data) {
+        document.getElementById('access_id').value = data.id;
+        document.getElementById('role_id').value = data.role_id;
+        document.getElementById('menu_id').value = data.menu_id;
+    }
+
+    function deleteAccess(id) {
+        if (!confirm('Yakin ingin menghapus akses ini?')) return;
+        fetch(accessApi, {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id})
+        })
+        .then(res => res.json())
+        .then(() => {
+            showNotif('Akses berhasil dihapus');
+            loadAccess();
+        });
+    }
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        document.getElementById('access_id').value = '';
+    });
+
+    document.addEventListener('DOMContentLoaded', loadAccess);
+</script>
+
+{% endblock %}
