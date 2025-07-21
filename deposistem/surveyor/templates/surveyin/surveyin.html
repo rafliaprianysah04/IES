@@ -1,0 +1,471 @@
+{% extends 'base_surveyor.html' %}
+{% load static %}
+
+{% block title %}Input Survey In{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12">
+        <h2 class="page-title">Form Survey In</h2>
+        <a class="text-muted">Input data container jika semua dokumen sesuai dan benar turun di depo PT. Intercon Terminal Indonesia Cakung</a>
+        <a href="https://maerskguide.pelayaranbintangputih.com/?act=do_release" target="_blank" style="text-decoration: underline; color: blue;">
+            Cek Dokumen Dengan No. DO
+        </a>
+        <div class="card-deck ">
+          <div class="card shadow mb-6">
+            <div class="card-header">
+              <strong class="card-title">Input Container</strong>
+            </div>
+            <div class="card-body">
+              <form method="POST">
+                {% csrf_token %}
+
+                <div class="row">
+                <div class="form-group col-md-2">
+                    <label for="customer">Customer</label>
+                    <select name="customer" id="customerCodeInput"  class="form-control">
+                      <option selected>MSL</option>
+                      <option>OCL</option>
+                      <option>...</option>
+                    </select>
+                  </div>
+
+                 <!-- <div class="form-group col-md-4">
+  <label for="cont">No. Container</label>
+  <select name="cont" id="cont" class="form-control select2" style="width: 100%;" required>
+    <option value="">--- Pilih atau Ketik No. Container ---</option>
+    {% for kontainerterdeteksi in deteksi_kontainer %}
+      <option value="{{ kontainerterdeteksi.nomor_kontainer }}">{{ kontainerterdeteksi.nomor_kontainer }}</option>
+    {% endfor %}
+  </select> -->
+<div class="form-group col-md-2">
+  <label for="cont">No. Container</label>
+
+  {% if deteksi_kontainer %}
+    {% if deteksi_kontainer|length > 1 %}
+      <select class="form-control mb-2" onchange="document.getElementById('contInput').value = this.value;">
+        <option value="">--- Pilih Salah Satu ---</option>
+        {% for k in deteksi_kontainer %}
+          <option value="{{ k.nomor_kontainer }}">{{ k.nomor_kontainer }}</option>
+        {% endfor %}
+      </select>
+      <input type="text" id="contInput" name="cont" maxlength="11" required class="form-control" value="{{ result.cont|default:'' }}">
+    {% else %}
+      <input type="text" id="contInput" name="cont" maxlength="11" required class="form-control" value="{{ deteksi_kontainer.0.nomor_kontainer }}">
+    {% endif %}
+  {% else %}
+    <input type="text" id="contInput" name="cont" maxlength="11" required class="form-control" value="{{ result.cont|default:'' }}">
+  {% endif %}
+</div>
+                  <div class="form-group col-md-2">
+                    <button type="submit" name="action" value="check" class="btn btn-info">Cek</button>
+                    {% if result %}
+                      {% if result.is_valid %}
+                        <p style="color: green;">✅ Nomor Kontainer VALID.</p>
+                      {% else %}
+                        <p style="color: red;">❌ Nomor Kontainer TIDAK VALID.</p>
+                      {% endif %}
+                    {% endif %}
+                  </div> 
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-md-2">
+                        <label for="size">Size</label>
+                        <select name="size" id="contSizeInput" class="form-control">
+                        <option value="20" {% if initial_data.size == "20" %}selected{% endif %}>20</option>
+                        <option value="40" {% if initial_data.size == "40" %}selected{% endif %}>40</option>
+                        <option value="45" {% if initial_data.size == "45" %}selected{% endif %}>45</option>
+                        </select>
+                      </div>
+                      <div class="form-group col-md-2">
+                        <label for="type">Type</label>
+                        <select name="type" id="contTypeInput" class="form-control">
+                        <option value="GP" {% if initial_data.type == "GP" %}selected{% endif %}>GP</option>
+                        <option value="RF" {% if initial_data.type == "RF" %}selected{% endif %}>RF</option>
+                        <option value="HU" {% if initial_data.type == "HU" %}selected{% endif %}>HU</option>
+                        <option value="RH" {% if initial_data.type == "RH" %}selected{% endif %}>RH</option>
+                        <option value="OT" {% if initial_data.type == "OT" %}selected{% endif %}>OT</option>
+                        <option value="FT" {% if initial_data.type == "FT" %}selected{% endif %}>FT</option>
+                        <option value="HR" {% if initial_data.type == "HR" %}selected{% endif %}>HR</option>
+                        <option value="TK" {% if initial_data.type == "TK" %}selected{% endif %}>TK</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group col-md-2">
+                        <label for="condition">Condition</label>
+                        <select name="condition" id="conditionInput" class="form-control">
+                          <option value="AV" {% if initial_data.condition == "AV" %}selected{% endif %}>AV</option>
+                          <option value="DM" {% if initial_data.condition == "DM" %}selected{% endif %}>DM</option>
+                        </select>
+                      </div>
+                    
+                      <div class="form-group col-md-2">
+                        <label for="grade">Grade</label>
+                        <select name="grade" id="gradeDepotInput" class="form-control">
+                          <option value="S" {% if initial_data.type == "S" %}selected{% endif %}>S</option>
+                          <option value="M" {% if initial_data.type == "M" %}selected{% endif %}>M</option>
+                          <option value="K" {% if initial_data.type == "K" %}selected{% endif %}>K</option>
+                          <option value="E" {% if initial_data.type == "E" %}selected{% endif %}>E</option>
+                          <option value="Q" {% if initial_data.type == "Q" %}selected{% endif %}>Q</option>
+                          <option value="A" {% if initial_data.type == "A" %}selected{% endif %}>A</option>
+                          <option value="B" {% if initial_data.type == "B" %}selected{% endif %}>B</option>
+                          <option value="C" {% if initial_data.type == "C" %}selected{% endif %}>C</option>
+                        </select>
+                      </div>
+                
+                      <div class="form-group col-md-2">
+                        <label for="washing">Washing</label>
+                        <select name="washing" id="washingInput" class="form-control">
+                          <option value="W" {% if initial_data.washing == "W" %}selected{% endif %}>W</option>
+                          <option value="D" {% if initial_data.washing == "D" %}selected{% endif %}>D</option>
+                          <option value="C" {% if initial_data.washing == "C" %}selected{% endif %}>C</option>
+                          <option value="X" {% if initial_data.washing == "X" %}selected{% endif %}>X</option>
+                        </select>
+                      </div>
+                      <div class="form-group col-md-2">
+                        <label for="act_in">Act In</label>
+                        <select name="act_in" class="form-control">
+                          <option value="IM" {% if initial_data.act_in == "IM" %}selected{% endif %}>IM</option>
+                          <option value="OB" {% if initial_data.act_in == "OB" %}selected{% endif %}>OB</option>
+                          <option value="ON" {% if initial_data.act_in == "ON" %}selected{% endif %}>ON</option>
+                        </select>
+                      </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-md-2">
+                        <label for="mnf_month">Mnf. Month</label>
+                        <select name="mnf_month" class="form-control">
+                            {% for i in double_digits %}
+                                 <option value="{{ i }}" {% if i == initial_data.mnf_month %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="mnf_year">Mnf. Year</label>
+                        <div class="d-flex">
+                            <select name="mnf_year1" class="form-control">
+                            {% for i in digits %}
+                                <option value="{{ i }}" {% if initial_data.mnf_year1 == i|stringformat:"s" %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                            <select name="mnf_year2" class="form-control">
+                            {% for i in digits %}
+                                <option value="{{ i }}" {% if initial_data.mnf_year2 == i|stringformat:"s" %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-3">
+                        <label for="tare">Tare</label>
+                        <div class="d-flex">
+                            <select name="tare1" class="form-control mr-1">
+                            {% for i in digits %}
+                                <option value="{{ i }}" {% if initial_data.tare1 == i|stringformat:"s" %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                            <select name="tare2" class="form-control">
+                            {% for i in digits %}
+                                <option value="{{ i }}" {% if initial_data.tare2 == i|stringformat:"s" %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+
+                           <select name="tare3" class="form-control">
+                            {% for i in double_digits %}
+                                <option value="{{ i }}" {% if initial_data.tare3 == i %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="payload">Payload</label>
+                        <div class="d-flex">
+                           <select name="payload1" class="form-control">
+                            {% for i in digits %}
+                                <option value="{{ i }}" {% if initial_data.payload1 == i|stringformat:"s" %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                            <select name="payload2" class="form-control">
+                            {% for i in digits %}
+                                <option value="{{ i }}" {% if initial_data.payload2 == i|stringformat:"s" %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                            <select name="payload3" class="form-control">
+                            {% for i in digits %}
+                                <option value="{{ i }}" {% if initial_data.payload3 == i|stringformat:"s" %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                            <select name="payload4" class="form-control">
+                            {% for i in double_digits %}
+                                <option value="{{ i }}" {% if initial_data.payload4 == i %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+            <div class="row">
+                <div class="form-group col-md-4">
+                  <label for="haulier_name">Haulier Name</label>
+                  <input type="text" class="form-control" name="haulier_name" id= "haulierInInput" placeholder="Enter Haulier">
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="truck_no">Truck No</label>
+                  <input type="text" name="truck_no_in" id= "truckNoInInput" class="form-control" value="{{ initial_data.truck_no_in|default:'' }}">
+                </div>
+            </div>
+
+                 <div class="row">
+                <div class="form-group col-md-2">
+                    <label for="washed_by">Washing Name</label>
+                    <select name="washed_by" class="form-control">
+                      <option>Agung Maulana</option>
+                      <option>Bahar</option>
+                      <option>Dede</option>
+                      <option>Eko</option>
+                      <option>Hamzah</option>
+                      <option>Yohanes</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-md-4">
+                    <label for="remark">Remark</label>
+                    <input type="text" class="form-control" name="remark" id="remarkInput" placeholder="Enter Remark">
+                  </div>
+            </div>
+
+            
+            <button type="submit" name="action" value="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-warning" name="action" value="generate_qr">Generate QR Code</button>
+            <button type="button" class="btn btn-secondary mt-2" data-bs-toggle="modal" data-bs-target="#scanQrModal">
+                Scan QR-Code
+                </button>
+
+
+                <!-- Modal Scanner QR -->
+<div class="modal fade" id="scanQrModal" tabindex="-1" aria-labelledby="scanQrModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="scanQrModalLabel">Scan QR-Code</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="stopScan()"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div id="reader" style="width: 100%; max-width: 600px; margin: auto;"></div>
+        <p id="scan-result" class="mt-3"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+                <!-- Modal QR Code -->
+              <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered text-center">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="qrModalLabel">QR Code untuk Container</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+
+                    <div class="modal-body">
+                      <img src="{{ qr_url }}" alt="QR Code" style="width: 300px; height: 300px;" class="img-fluid mb-3">
+                      <div>
+                        <a href="{{ qr_url }}" class="btn btn-primary" download>Download QR-Code</a>
+                        <button onclick="window.print()" class="btn btn-success">Cetak QR-Code</button>
+                      </div>
+                    </div>
+
+                    <div class="modal-footer justify-content-center">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </form>
+      
+            
+                {% if result.success %}
+                  <p style="color: green;">{{ result.success }}</p>
+                {% endif %}
+                {% if result.error %}
+                  <p style="color: red;">{{ result.error }}</p>
+                {% endif %}
+
+
+               {% if success and qr_url %}
+                <!-- Trigger otomatis modal -->
+                <script>
+                    window.addEventListener('DOMContentLoaded', function () {
+                        var qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
+                        qrModal.show();
+                    });
+                </script>
+                {% endif %}
+
+
+<!-- Modal Upload Foto dan QR Code -->
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="final_submit">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Upload Tambahan</h5>
+        </div>
+        <div class="modal-body">
+          {% if success_message %}
+            <div class="alert alert-success">{{ success_message }}</div>
+          {% endif %}
+
+          {% if survey.photo %}
+            <div class="mb-3 text-center">
+              <strong>Foto Kontainer:</strong><br>
+              <img src="{{ survey.photo.url }}" alt="Foto" class="img-thumbnail" style="max-height: 200px;">
+            </div>
+          {% else %}
+            <div class="form-group">
+              <label for="foto">Upload Foto Kontainer</label>
+              <input type="file" name="foto" class="form-control" required>
+            </div>
+          {% endif %}
+
+          {% if survey.qr_code %}
+            <hr>
+            <div class="text-center">
+              <strong>QR Code Kontainer:</strong><br>
+              <img src="{{ survey.qr_code.url }}" alt="QR Code" style="max-width: 200px;" class="mb-3"><br>
+              <a href="{{ survey.qr_code.url }}" download class="btn btn-success btn-sm">Download QR</a>
+              <button type="button" onclick="window.print()" class="btn btn-secondary btn-sm">Cetak</button>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="modal-footer">
+          {% if not survey.photo %}
+            <button type="submit" class="btn btn-success">Simpan dan Tampilkan QR</button>
+          {% else %}
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+          {% endif %}
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if show_modal %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var uploadModal = new bootstrap.Modal(document.getElementById('uploadModal'));
+    uploadModal.show();
+  });
+</script>
+{% endif %}
+
+
+{% if result.error %}      
+<script>
+  window.addEventListener('DOMContentLoaded', function () {
+    var warningModal = new bootstrap.Modal(document.getElementById('warningModal'));
+    warningModal.show();
+  });
+</script>
+{% endif %}
+
+
+
+
+           <!-- Script untuk Menampilkan Modal jika show_upload_modal True -->
+{% if show_upload_modal %}
+<script>
+  // Menampilkan modal jika kondisi memenuhi
+  window.addEventListener('DOMContentLoaded', function () {
+    // Pastikan modal ditampilkan dengan benar menggunakan Bootstrap 5
+    var myModal = new bootstrap.Modal(document.getElementById('uploadModal'));
+    myModal.show();
+  });
+</script>
+{% endif %}
+
+
+<!-- Load Select2 CSS & JS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+    $('#cont').select2({
+      tags: true,
+      placeholder: 'Ketik atau pilih nomor kontainer',
+      allowClear: true
+    });
+  });
+</script>
+
+
+<!-- Load QR Scanner Library -->
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+<script>
+  let qrScanner;
+
+  function startScan() {
+    const qrRegion = document.getElementById("reader");
+
+    qrScanner = new Html5Qrcode("reader");
+    qrScanner.start(
+      { facingMode: "environment" }, 
+      { fps: 10, qrbox: 250 },
+      (decodedText, decodedResult) => {
+        document.getElementById("scan-result").innerHTML = `<strong>QR Ditemukan:</strong> ${decodedText}`;
+        document.getElementById("contInput").value = decodedText;
+
+        // Fetch data ke server
+        fetch(`/get_container_qrcode/?cont=${decodedText}`)
+          .then(response => response.json())
+          .then(data => {
+            // Isi form input
+            document.getElementById("contSizeInput").value = data.cont_size || '';
+            document.getElementById("contTypeInput").value = data.cont_type || '';
+            document.getElementById("conditionInput").value = data.condition || '';
+            document.getElementById("manufactureInput").value = data.manufacture || '';
+            document.getElementById("customerCodeInput").value = data.customer_code || '';
+            document.getElementById("gradeDepotInput").value = data.grade_depot || '';
+          })
+          .catch(error => {
+            alert("Gagal mengambil data dari server.");
+          });  
+
+        // Tutup modal dan stop scan
+        const scanModal = bootstrap.Modal.getInstance(document.getElementById('scanQrModal'));
+        scanModal.hide();
+        stopScan();
+      },
+      errorMessage => {}
+    );
+  }
+
+  function stopScan() {
+    if (qrScanner) {
+      qrScanner.stop().then(() => qrScanner.clear());
+    }
+  }
+
+  document.getElementById('scanQrModal').addEventListener('shown.bs.modal', startScan);
+  document.getElementById('scanQrModal').addEventListener('hidden.bs.modal', stopScan);
+</script>
+
+
+
+
+    </div>
+  </div>
+</div>
+</div> </div>
+
+          {% endblock %}

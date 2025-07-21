@@ -20,6 +20,8 @@ def app_view(request):
 
     # URL dengan token
     finance_url = f"http://127.0.0.1:8888/finance/?token={token}"
+    online_presence = f"http://127.0.0.1:8118/presence/?token={token}"
+    depo_url = f"http://127.0.0.1:8883/home/?token={token}"
 
     base_menus = {
         'finance': [
@@ -33,7 +35,27 @@ def app_view(request):
                 'name': 'Online Presence',
                 'icon': 'fa-wifi',
                 'color': '#2980b9',
-                'url': '/presence/',
+                'url': online_presence,
+            },
+            {
+                'name': 'Learning Management System',
+                'icon': 'fa-graduation-cap',
+                'color': '#8e44ad',
+                'url': '/lms/',
+            },
+        ],
+        'security': [
+            {
+                'name': 'Depo Management System',
+                'icon': 'fa-file-invoice-dollar',
+                'color': '#34495e',
+                'url': depo_url,
+            },
+            {
+                'name': 'Online Presence',
+                'icon': 'fa-wifi',
+                'color': '#2980b9',
+                'url': online_presence,
             },
             {
                 'name': 'Learning Management System',
@@ -50,10 +72,10 @@ def app_view(request):
                 'url': '/superadmin/',
             },
             {
-                'name': 'Depo Management System Keuangan',
+                'name': 'Depo System',
                 'icon': 'fa-file-invoice-dollar',
                 'color': '#34495e',
-                'url': '/depo/keuangan/',
+                'url': depo_url,
             },
             {
                 'name': 'Finance',
@@ -71,10 +93,16 @@ def app_view(request):
                 'name': 'Online Presence',
                 'icon': 'fa-wifi',
                 'color': '#2980b9',
-                'url': '/presence/',
+                'url': online_presence,
             },
             {
                 'name': 'Learning Management System',
+                'icon': 'fa-graduation-cap',
+                'color': '#8e44ad',
+                'url': '/lms/',
+            },
+            {
+                'name': 'Portal Customer',
                 'icon': 'fa-graduation-cap',
                 'color': '#8e44ad',
                 'url': '/lms/',

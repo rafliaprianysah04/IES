@@ -1,0 +1,188 @@
+{% extends 'presence/base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  video {
+    border-radius: 10px;
+    border: 2px solid #ccc;
+  }
+  .img-preview {
+    max-height: 180px;
+  }
+</style>
+
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          Kamera Absensi
+        </div>
+        <div class="card-body mt-3">
+          <video id="video" width="100%" autoplay muted></video>
+          <input type="hidden" id="absenType" name="type" value="in">
+          <div class="mt-3 d-grid gap-2">
+            <button class="btn btn-primary" onclick="setAbsenType('in')">Absen Masuk</button>
+            <button class="btn btn-success" onclick="setAbsenType('out')">Absen Pulang</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+          Hasil Deteksi Wajah
+        </div>
+        <div class="card-body text-center">
+          <img id="preview" src="" alt="Preview Wajah" class="img-thumbnail d-none img-preview">
+          <p id="statusMessage" class="mt-3"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-secondary text-white">
+          Riwayat Absensi Terbaru
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr>
+                  <th>Nama</th>
+                  <th>Email</th>
+                  <th>Tanggal</th>
+                  <th>Masuk</th>
+                  <th>Pulang</th>
+                  <th>Durasi</th>
+                  <th>Foto Masuk</th>
+                  <th>Foto Pulang</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in rows %}
+                <tr>
+                  <td>{{ row.name }}</td>
+                  <td>{{ row.email }}</td>
+                  <td>{{ row.date }}</td>
+                  <td>{{ row.checkin_time|default:'-' }}</td>
+                  <td>{{ row.checkout_time|default:'-' }}</td>
+                  <td>
+                    {% if row.duration_hours is not None %}
+                      <span class="badge {% if row.duration_hours >= 8 %}bg-success{% else %}bg-danger{% endif %}">
+                        {{ row.duration_hours }} Jam
+                      </span>
+                    {% else %}-{% endif %}
+                  </td>
+                  <td>
+                    {% if row.checkin_photo %}
+                      <img src="{{ row.checkin_photo }}" class="img-thumbnail img-preview">
+                    {% else %}-{% endif %}
+                  </td>
+                  <td>
+                    {% if row.checkout_photo %}
+                      <img src="{{ row.checkout_photo }}" class="img-thumbnail img-preview">
+                    {% else %}-{% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script>
+  const video = document.getElementById('video');
+  const preview = document.getElementById('preview');
+  const statusMessage = document.getElementById('statusMessage');
+  const absenTypeInput = document.getElementById('absenType');
+  const token = "{{ token }}";  // ✅ ambil token dari context
+
+  function setAbsenType(type) {
+    absenTypeInput.value = type;
+  }
+
+  let blinked = false;
+  let lastEAR = 0;
+
+  function getEAR(landmarks) {
+    const getDistance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+    const leftEye = [33, 160, 158, 133, 153, 144];
+    const d1 = getDistance(landmarks[leftEye[1]], landmarks[leftEye[5]]);
+    const d2 = getDistance(landmarks[leftEye[2]], landmarks[leftEye[4]]);
+    const d3 = getDistance(landmarks[leftEye[0]], landmarks[leftEye[3]]);
+    return (d1 + d2) / (2.0 * d3);
+  }
+
+  const faceMesh = new FaceMesh({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}` });
+  faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+
+  faceMesh.onResults(results => {
+    if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+      const ear = getEAR(results.multiFaceLandmarks[0]);
+      if (ear < 0.18 && lastEAR >= 0.18) {
+        blinked = true;
+        console.log('Blinked!');
+      }
+      lastEAR = ear;
+    }
+  });
+
+  const camera = new Camera(video, {
+    onFrame: async () => {
+      await faceMesh.send({ image: video });
+    },
+    width: 640,
+    height: 480
+  });
+  camera.start();
+
+  function captureAndSend() {
+    if (!blinked) return;
+    blinked = false;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+
+    canvas.toBlob(blob => {
+      const formData = new FormData();
+      formData.append('image', blob, 'capture.jpg');
+      formData.append('type', absenTypeInput.value);
+      formData.append('token', token);  // ✅ tambahkan token ke formData
+
+      fetch("{% url 'presence:recognize_and_log' %}", {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        statusMessage.innerText = data.message;
+        if (data.status === 'success' && data.photo_url) {
+          preview.src = data.photo_url;
+          preview.classList.remove('d-none');
+          setTimeout(() => location.reload(), 2000);
+        }
+      })
+      .catch(error => {
+        statusMessage.innerText = 'Terjadi kesalahan saat mengirim data.';
+        console.error(error);
+      });
+    }, 'image/jpeg');
+  }
+
+  setInterval(captureAndSend, 2000);
+</script>
+
+{% endblock %}

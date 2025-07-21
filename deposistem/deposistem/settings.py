@@ -11,20 +11,16 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from django.contrib.messages import constants as messages
+from datetime import timedelta
+import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = 'django-insecure-w0x#918w9ftny0!$rvlwwf)=ez-)g8q!6exuc-=2&#xc__g^fu'
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*edpxurv(*+c*w74d=2y72#)j=i=pg(2n9&l_n*1c=9(a@zt0$'
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -37,6 +33,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'home',
+    'camera',
+    'customer_service',
+    'mnr',
+    'security',
+    'surveyor',
+    'tax',
 ]
 
 MIDDLEWARE = [
@@ -47,6 +50,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'surveyor.middleware.ExternalUserMiddleware',
+    'home.middleware.ExternalUserMiddleware',
 ]
 
 ROOT_URLCONF = 'deposistem.urls'
@@ -54,7 +59,7 @@ ROOT_URLCONF = 'deposistem.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -62,6 +67,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'home.context_processors.menu_context',
+                'home.context_processors.token_context',
+                'surveyor.context_processors.menu_context',
+                'surveyor.context_processors.token_context',
             ],
         },
     },
@@ -75,8 +84,12 @@ WSGI_APPLICATION = 'deposistem.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'eis',
+        'USER': 'postgres',
+        'PASSWORD': 'dimas123',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -116,8 +129,49 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# -----------------------------
+# CSRF / SECURITY
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = True
+
+# -----------------------------
+# EMAIL SETTINGS
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'raflikftdplg@gmail.com'
+EMAIL_HOST_PASSWORD = 'njlx misk jypk qbwi'
+DEFAULT_FROM_EMAIL = 'raflikftdplg@gmail.com'
+
+EMAIL_SUBJECT_PREFIX = '[ERP Sistem] '
+PASSWORD_RESET_CONFIRM_URL = '/reset/<uidb64>/<token>/'
+
+# -----------------------------
+# LOGIN / LOGOUT REDIRECT
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'
+
+
+# -----------------------------
+# MESSAGE TAGS
+MESSAGE_TAGS = {
+    messages.DEBUG: 'debug',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'error',
+}

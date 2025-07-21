@@ -31,7 +31,7 @@ def resolve_url_path(url_str):
     except NoReverseMatch:
         return '#'  # fallback jika nama route tidak ditemukan
 
-def dashboard(request):
+def dashboard(request): 
     user = get_user_from_token(request)
     if not user:
         return render(request, 'unauthorized.html', status=401)
@@ -45,7 +45,7 @@ def coa(request):
     return render(request, 'master/coa.html', {'token': token})
 
 #LEDGER
-def ledger(request):
+def ledger(request):    
     user = get_user_from_token(request)
     if not user:
         return render(request, 'unauthorized.html', status=401)
@@ -760,6 +760,7 @@ def sales_remaining(request):
 
     # Mapping cabang
     cabang_mapping = {
+        'ITI011' :'Head Office',
         'ITI041': 'Belawan',
         'ITI021': 'Jakarta',
         'ITI051': 'Lampung',
@@ -813,8 +814,10 @@ def sales_remaining(request):
             'total': float(c['total'] or 0),
         })
 
+    total_debit = sum(item['debit'] for item in data)
     context = {
         'title': 'Sales Remaining',
+        'total_debit':total_debit,
         'token': token,
         'customerAll': data,
         'customer': customer_data,

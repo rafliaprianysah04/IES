@@ -1,0 +1,304 @@
+{% extends 'base_surveyor.html' %}
+{% load static %}
+
+{% block title %}Input Survey In{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12">
+        <h2 class="page-title">Form Survey In</h2>
+        <a class="text-muted">Input data container jika semua dokumen sesuai dan benar turun di depo PT. Intercon Terminal Indonesia Cakung</a>
+        <a href="https://maerskguide.pelayaranbintangputih.com/?act=do_release" target="_blank" style="text-decoration: underline; color: blue;">
+            Cek Dokumen Dengan No. DO
+        </a>
+        <div class="card-deck ">
+          <div class="card shadow mb-6">
+            <div class="card-header">
+              <strong class="card-title">Input Container</strong>
+            </div>
+            <div class="card-body">
+              <form method="POST">
+                {% csrf_token %}
+
+                <div class="form-row">
+                <div class="form-group col-md-2">
+                    <label for="customer">Customer</label>
+                    <select name="customer"  class="form-control">
+                      <option selected>MSL</option>
+                      <option>OCL</option>
+                      <option>...</option>
+                    </select>
+                  </div>
+
+                 <!-- <div class="form-group col-md-4">
+  <label for="cont">No. Container</label>
+  <select name="cont" id="cont" class="form-control select2" style="width: 100%;" required>
+    <option value="">--- Pilih atau Ketik No. Container ---</option>
+    {% for kontainerterdeteksi in deteksi_kontainer %}
+      <option value="{{ kontainerterdeteksi.nomor_kontainer }}">{{ kontainerterdeteksi.nomor_kontainer }}</option>
+    {% endfor %}
+  </select> -->
+
+                  <div class="form-group col-md-6">
+                    <label for="cont">No. Container</label>
+                    <input type="text" name="cont" maxlength="11" required value="{{ result.cont|default:'' }}">
+
+                    <button type="submit" name="action" value="check" class="btn btn-info">Cek</button>
+                    {% if result %}
+                      {% if result.is_valid %}
+                        <p style="color: green;">✅ Nomor Kontainer VALID.</p>
+                      {% else %}
+                        <p style="color: red;">❌ Nomor Kontainer TIDAK VALID.</p>
+                      {% endif %}
+                    {% endif %}
+
+
+                  </div> 
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-2">
+                        <label for="size">Size</label>
+                        <select name="size" class="form-control">
+                        <option value="20" {% if initial_data.size == "20" %}selected{% endif %}>20</option>
+                        <option value="40" {% if initial_data.size == "40" %}selected{% endif %}>40</option>
+                        <option value="45" {% if initial_data.size == "45" %}selected{% endif %}>45</option>
+                        </select>
+                      </div>
+                      <div class="form-group col-md-2">
+                        <label for="type">Type</label>
+                        <select name="type" class="form-control">
+                        <option value="GP" {% if initial_data.type == "GP" %}selected{% endif %}>GP</option>
+                        <option value="RF" {% if initial_data.type == "RF" %}selected{% endif %}>RF</option>
+                        <option value="HU" {% if initial_data.type == "HU" %}selected{% endif %}>HU</option>
+                        <option value="RH" {% if initial_data.type == "RH" %}selected{% endif %}>RH</option>
+                        <option value="OT" {% if initial_data.type == "OT" %}selected{% endif %}>OT</option>
+                        <option value="FT" {% if initial_data.type == "FT" %}selected{% endif %}>FT</option>
+                        <option value="HR" {% if initial_data.type == "HR" %}selected{% endif %}>HR</option>
+                        <option value="TK" {% if initial_data.type == "TK" %}selected{% endif %}>TK</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group col-md-2">
+                        <label for="condition">Condition</label>
+                        <select name="condition" class="form-control">
+                          <option value="AV" {% if initial_data.condition == "AV" %}selected{% endif %}>AV</option>
+                          <option value="DM" {% if initial_data.condition == "DM" %}selected{% endif %}>DM</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group col-md-2">
+                        <label for="washing">Washing</label>
+                        <select name="washing" class="form-control">
+                          <option value="W" {% if initial_data.washing == "W" %}selected{% endif %}>W</option>
+                          <option value="D" {% if initial_data.washing == "D" %}selected{% endif %}>D</option>
+                          <option value="C" {% if initial_data.washing == "C" %}selected{% endif %}>C</option>
+                          <option value="X" {% if initial_data.washing == "X" %}selected{% endif %}>X</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group col-md-2">
+                        <label for="grade">Grade</label>
+                        <select name="grade" class="form-control">
+                          <option value="S" {% if initial_data.type == "S" %}selected{% endif %}>S</option>
+                          <option value="M" {% if initial_data.type == "M" %}selected{% endif %}>M</option>
+                          <option value="K" {% if initial_data.type == "K" %}selected{% endif %}>K</option>
+                          <option value="E" {% if initial_data.type == "E" %}selected{% endif %}>E</option>
+                          <option value="Q" {% if initial_data.type == "Q" %}selected{% endif %}>Q</option>
+                          <option value="A" {% if initial_data.type == "A" %}selected{% endif %}>A</option>
+                          <option value="B" {% if initial_data.type == "B" %}selected{% endif %}>B</option>
+                          <option value="C" {% if initial_data.type == "C" %}selected{% endif %}>C</option>
+                        </select>
+                      </div>
+                      
+                      <div class="form-group col-md-2">
+                        <label for="act_in">Act In</label>
+                        <select name="act_in" class="form-control">
+                          <option value="IM" {% if initial_data.act_in == "IM" %}selected{% endif %}>IM</option>
+                          <option value="OB" {% if initial_data.act_in == "OB" %}selected{% endif %}>OB</option>
+                          <option value="ON" {% if initial_data.act_in == "ON" %}selected{% endif %}>ON</option>
+                        </select>
+                      </div>
+
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-2">
+                        <label for="mnf_month">Mnf. Month</label>
+                        <select name="mnf_month" class="form-control">
+                            {% for i in double_digits %}
+                                <option value="{{ i }}" {% if initial_data.mnf_month == i %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="mnf_year">Mnf. Year</label>
+                        <div class="d-flex">
+                            <select name="mnf_year1" class="form-control">
+                            {% for i in digits %}
+                                <option value="{{ i }}" {% if initial_data.mnf_year1 == i|stringformat:"s" %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                            <select name="mnf_year2" class="form-control">
+                            {% for i in digits %}
+                                <option value="{{ i }}" {% if initial_data.mnf_year2 == i|stringformat:"s" %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-3">
+                        <label for="tare">Tare</label>
+                        <div class="d-flex">
+                            <select name="tare1" class="form-control mr-1">
+                            {% for i in digits %}
+                                <option value="{{ i }}" {% if initial_data.tare1 == i|stringformat:"s" %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                            <select name="tare2" class="form-control">
+                            {% for i in digits %}
+                                <option value="{{ i }}" {% if initial_data.tare2 == i|stringformat:"s" %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+
+                           <select name="tare3" class="form-control">
+                            {% for i in double_digits %}
+                                <option value="{{ i }}" {% if initial_data.tare3 == i %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="payload">Payload</label>
+                        <div class="d-flex">
+                           <select name="payload1" class="form-control">
+                            {% for i in digits %}
+                                <option value="{{ i }}" {% if initial_data.payload1 == i|stringformat:"s" %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                            <select name="payload2" class="form-control">
+                            {% for i in digits %}
+                                <option value="{{ i }}" {% if initial_data.payload2 == i|stringformat:"s" %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                            <select name="payload3" class="form-control">
+                            {% for i in digits %}
+                                <option value="{{ i }}" {% if initial_data.payload3 == i|stringformat:"s" %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                            <select name="payload4" class="form-control">
+                            {% for i in double_digits %}
+                                <option value="{{ i }}" {% if initial_data.payload4 == i %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                  <label for="haulier_name">Haulier Name</label>
+                  <input type="text" class="form-control" name="haulier_name" placeholder="Enter Haulier">
+                </div>
+                <div class="form-group col-md-4">
+                  <label for="truck_no">Truck No</label>
+                  <input type="text" name="truck_no_in" class="form-control" value="{{ initial_data.truck_no_in|default:'' }}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <label for="washed_by">Washing Name</label>
+                    <select name="washed_by" class="form-control">
+                      <option>Agung Maulana</option>
+                      <option>Bahar</option>
+                      <option>Dede</option>
+                      <option>Eko</option>
+                      <option>Hamzah</option>
+                      <option>Yohanes</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-md-4">
+                    <label for="remark">Remark</label>
+                    <input type="text" class="form-control" id="remark" placeholder="Enter Remark">
+                  </div>
+            </div>
+
+            
+            <button type="submit" name="action" value="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-warning" name="action" value="generate_qr">Generate QR Code</button>
+
+
+
+
+                           
+
+            </form>
+      
+            
+                {% if result.success %}
+                  <p style="color: green;">{{ result.success }}</p>
+                {% endif %}
+                {% if result.error %}
+                  <p style="color: red;">{{ result.error }}</p>
+                {% endif %}
+
+
+                {% if success and qr_url %}
+                <!-- Trigger otomatis modal -->
+                <script>
+                    window.addEventListener('DOMContentLoaded', function () {
+                        var qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
+                        qrModal.show();
+                    });
+                </script>
+                {% endif %}
+
+{% if result.error %}
+<script>
+  window.addEventListener('DOMContentLoaded', function () {
+    var warningModal = new bootstrap.Modal(document.getElementById('warningModal'));
+    warningModal.show();
+  });
+</script>
+{% endif %}
+
+
+
+
+           <!-- Script untuk Menampilkan Modal jika show_upload_modal True -->
+{% if show_upload_modal %}
+<script>
+  // Menampilkan modal jika kondisi memenuhi
+  window.addEventListener('DOMContentLoaded', function () {
+    // Pastikan modal ditampilkan dengan benar menggunakan Bootstrap 5
+    var myModal = new bootstrap.Modal(document.getElementById('uploadModal'));
+    myModal.show();
+  });
+</script>
+{% endif %}
+<!-- Load Select2 CSS & JS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+    $('#cont').select2({
+      tags: true,
+      placeholder: 'Ketik atau pilih nomor kontainer',
+      allowClear: true
+    });
+  });
+</script>
+
+    </div>
+  </div>
+</div>
+        
+            </div>
+        </div>
+
+          {% endblock %}

@@ -1,0 +1,28 @@
+.sales-remaining-all {
+    display: grid;
+    grid-template-columns: auto max-content;
+    overflow: hidden;
+    gap: 10px;
+}
+
+.kiri, .kanan {
+    padding: 20px;
+    background-color: white;
+}
+
+.kiri {
+    max-height: 600px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-rows: max-content auto max-content;
+}
+
+.kanan {
+    height: fit-content;
+}
+
+.kiri .action input, .kiri .action select {
+    margin-right: 10px;
+    padding: 5px;
+    font-size: 14px;
+}

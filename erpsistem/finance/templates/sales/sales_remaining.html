@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static humanize %}
+{% load static humanize %} 
 {% block content %}
 <div id="app">
     <div class="sales-remaining-all">
@@ -17,8 +17,8 @@
 
                 <select id="customerFilter">
                     <option value="">Select Customer</option>
-                    {% for cust in per_customer %}
-                        <option value="{{ cust }}">{{ cust }}</option>
+                    {% for cust in customer %}
+                        <option value="{{ cust.contact_alias }}">{{ cust.contact_alias }}</option>
                     {% endfor %}
                 </select>
 
@@ -39,14 +39,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for idx, item in combined_data|dictsortreversed:"inputdate" %}
+                     {% for item in combined_data|dictsortreversed:"inputdate" %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
                         <td>{{ item.inputdate }}</td>
                         <td>{{ item.reference }}</td>
                         <td>Rp {{ item.debit|floatformat:2|intcomma }}</td>
                         <td>{{ item.contact_alias }}</td>
-                        <td>{{ item.branch }}</td>
+                        <td>{{ item.branch_id }}</td>
                         <td>{{ item.name }}</td>
                     </tr>
                     {% endfor %}
@@ -58,11 +58,11 @@
             <div class="wrap-customer mb-4">
                 <p>Remaining Sales Invoice Per-Customer</p>
                 <table>
-                    {% for name, amount in per_customer.items %}
+                    {% for cust in customer %}
                     <tr>
-                        <td style="width: 200px;">{{ name }}</td>
+                        <td style="width: 200px;">{{ cust.contact_alias }}</td>
                         <td style="width: 10px;">:</td>
-                        <td>Rp {{ amount|floatformat:2|intcomma }}</td>
+                        <td>Rp {{ cust.total|floatformat:2|intcomma }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -71,7 +71,7 @@
             <div class="wrap-branch">
                 <p>Remaining Sales Invoice Per-Branch</p>
                 <table>
-                    {% for name, amount in per_branch.items %}
+                    {% for name, amount in debit_branch.items %}
                     <tr>
                         <td style="width: 200px;">{{ name }}</td>
                         <td style="width: 10px;">:</td>
