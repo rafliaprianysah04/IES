@@ -1,0 +1,136 @@
+{% extends 'base_surveyor.html' %}
+{% load static %}
+
+{% block title %}Detail Survey In{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h4 class="text-center mb-4">Detail Survey In: {{ surveyins.cont }}</h4>
+
+  <div class="card shadow-sm rounded-4">
+    <div class="card-body p-3">
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Container</div>
+        <div class="col-7">{{ surveyins.cont }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Customer Code</div>
+        <div class="col-7">{{ surveyins.customer_code }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Size / Type</div>
+        <div class="col-7">{{ surveyins.cont_size }} / {{ surveyins.cont_type }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Condition</div>
+        <div class="col-7">{{ surveyins.condition }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Washing / By</div>
+        <div class="col-7">{{ surveyins.washing }} / {{ surveyins.washed_by }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Manufacture</div>
+        <div class="col-7">{{ surveyins.manufacture }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Tare / Payload</div>
+        <div class="col-7">{{ surveyins.tare }} / {{ surveyins.payload }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Grade</div>
+        <div class="col-7">{{ surveyins.grade_depot }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Truck / Haulier</div>
+        <div class="col-7">{{ surveyins.truck_no_in }} / {{ surveyins.haulier_in }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Stacking</div>
+        <div class="col-7">{{ surveyins.stacking_status }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Remark</div>
+        <div class="col-7">{{ surveyins.remark }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Status / Photo Status</div>
+        <div class="col-7">{{ surveyins.status }} / {{ surveyins.photo_status }}</div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-5 fw-bold">Created / Updated</div>
+        <div class="col-7">
+          {{ surveyins.created_at|date:"Y-m-d H:i" }}<br>
+          {{ surveyins.updated_at|date:"Y-m-d H:i" }}
+        </div>
+      </div>
+
+                {% if photos %}
+            <div class="row mb-3">
+            <div class="col-12">
+                <h6>Foto Tambahan:</h6>
+                <div class="row">
+                {% for photo in photos %}
+                <div class="col-6 col-md-4 col-lg-3 mb-3">
+                    <img src="{{ photo.image.url }}" alt="Foto Tambahan"
+                        class="img-fluid rounded border"
+                        style="max-height: 200px; cursor: pointer;"
+                        data-bs-toggle="modal" data-bs-target="#photoModal"
+                        onclick="showModalImage('{{ photo.image.url }}')">
+                </div>
+                {% endfor %}
+                </div>
+            </div>
+            </div>
+            {% else %}
+            <div class="row mb-3">
+            <div class="col-12 text-center text-muted"><em>Belum ada foto tambahan</em></div>
+            </div>
+            {% endif %}
+
+      <div class="text-center">
+        <a href="{% url 'surveyor:list_surveyin' %}?token={{token}}" class="btn btn-outline-secondary btn-sm px-4 rounded-pill">Kembali</a>
+      </div>
+
+
+      <!-- Modal Preview Foto -->
+<div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="photoModalLabel">Preview Photo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="modalImage" src="" alt="Preview" class="img-fluid rounded shadow mb-3">
+          <br>
+          <a id="downloadLink" href="#" class="btn btn-outline-primary" download target="_blank">
+            Download Foto
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+  </div>
+</div>
+<script>
+    function showModalImage(url) {
+      document.getElementById('modalImage').src = url;
+      document.getElementById('downloadLink').href = url;
+    }
+  </script>
+{% endblock %}

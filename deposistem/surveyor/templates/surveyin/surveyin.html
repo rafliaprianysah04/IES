@@ -25,7 +25,7 @@
                 <div class="row">
                 <div class="form-group col-md-2">
                     <label for="customer">Customer</label>
-                    <select name="customer" id="customerCodeInput"  class="form-control">
+                    <select name="customer_code" id="customerCodeInput"  class="form-control">
                       <option selected>MSL</option>
                       <option>OCL</option>
                       <option>...</option>
@@ -74,7 +74,7 @@
                 <div class="row">
                     <div class="form-group col-md-2">
                         <label for="size">Size</label>
-                        <select name="size" id="contSizeInput" class="form-control">
+                        <select name="cont_size" id="contSizeInput" class="form-control">
                         <option value="20" {% if initial_data.size == "20" %}selected{% endif %}>20</option>
                         <option value="40" {% if initial_data.size == "40" %}selected{% endif %}>40</option>
                         <option value="45" {% if initial_data.size == "45" %}selected{% endif %}>45</option>
@@ -82,7 +82,7 @@
                       </div>
                       <div class="form-group col-md-2">
                         <label for="type">Type</label>
-                        <select name="type" id="contTypeInput" class="form-control">
+                        <select name="cont_type" id="contTypeInput" class="form-control">
                         <option value="GP" {% if initial_data.type == "GP" %}selected{% endif %}>GP</option>
                         <option value="RF" {% if initial_data.type == "RF" %}selected{% endif %}>RF</option>
                         <option value="HU" {% if initial_data.type == "HU" %}selected{% endif %}>HU</option>
@@ -103,8 +103,8 @@
                       </div>
                     
                       <div class="form-group col-md-2">
-                        <label for="grade">Grade</label>
-                        <select name="grade" id="gradeDepotInput" class="form-control">
+                        <label for="grade_depot">Grade</label>
+                        <select name="grade_depot" id="gradeDepotInput" class="form-control">
                           <option value="S" {% if initial_data.type == "S" %}selected{% endif %}>S</option>
                           <option value="M" {% if initial_data.type == "M" %}selected{% endif %}>M</option>
                           <option value="K" {% if initial_data.type == "K" %}selected{% endif %}>K</option>
@@ -210,8 +210,8 @@
                 
             <div class="row">
                 <div class="form-group col-md-4">
-                  <label for="haulier_name">Haulier Name</label>
-                  <input type="text" class="form-control" name="haulier_name" id= "haulierInInput" placeholder="Enter Haulier">
+                  <label for="haulier_in">Haulier Name</label>
+                  <input type="text" class="form-control" name="haulier_in" id= "haulierInInput" placeholder="Enter Haulier">
                 </div>
                 <div class="form-group col-md-4">
                   <label for="truck_no">Truck No</label>
@@ -329,9 +329,9 @@
               <img src="{{ survey.photo.url }}" alt="Foto" class="img-thumbnail" style="max-height: 200px;">
             </div>
           {% else %}
-            <div class="form-group">
-              <label for="foto">Upload Foto Kontainer</label>
-              <input type="file" name="foto" class="form-control" required>
+           <div class="form-group">
+            <label for="foto">Upload Foto Kontainer</label>
+            <input type="file" name="foto" class="form-control" accept="image/*" capture="environment" multiple required>
             </div>
           {% endif %}
 
@@ -409,7 +409,7 @@
 
 
 <!-- Load QR Scanner Library -->
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
   let qrScanner;
@@ -419,34 +419,107 @@
 
     qrScanner = new Html5Qrcode("reader");
     qrScanner.start(
-      { facingMode: "environment" }, 
+      { facingMode: "environment" },
       { fps: 10, qrbox: 250 },
-      (decodedText, decodedResult) => {
-        document.getElementById("scan-result").innerHTML = `<strong>QR Ditemukan:</strong> ${decodedText}`;
-        document.getElementById("contInput").value = decodedText;
+      (decodedText) => {
+        const lines = decodedText.trim().split('\n');
+        const qrRaw = lines[0].trim();
 
-        // Fetch data ke server
-        fetch(`/get_container_qrcode/?cont=${decodedText}`)
-          .then(response => response.json())
-          .then(data => {
-            // Isi form input
-            document.getElementById("contSizeInput").value = data.cont_size || '';
-            document.getElementById("contTypeInput").value = data.cont_type || '';
-            document.getElementById("conditionInput").value = data.condition || '';
-            document.getElementById("manufactureInput").value = data.manufacture || '';
-            document.getElementById("customerCodeInput").value = data.customer_code || '';
-            document.getElementById("gradeDepotInput").value = data.grade_depot || '';
-          })
-          .catch(error => {
-            alert("Gagal mengambil data dari server.");
-          });  
+        // Jika QR mengandung delimiter "|", berarti format lengkap
+        if (qrRaw.includes("|")) {
+          const parts = qrRaw.split("|");
 
-        // Tutup modal dan stop scan
-        const scanModal = bootstrap.Modal.getInstance(document.getElementById('scanQrModal'));
-        scanModal.hide();
-        stopScan();
-      },
-      errorMessage => {}
+          // Format QR: cont|customer_code|cont_size|cont_type|condition|washing|grade_depot|manufacture|tare|payload
+          const [
+            cont,
+            customer_code,
+            cont_size,
+            cont_type,
+            condition,
+            washing,
+            grade_depot,
+            manufacture,
+            tare,
+            payload
+          ] = parts;
+
+          document.getElementById("scan-result").innerHTML = `<strong>QR Data:</strong> ${qrRaw}`;
+          document.getElementById("contInput").value = cont || '';
+          document.getElementById("customerCodeInput").value = customer_code || '';
+          document.getElementById("contSizeInput").value = cont_size || '';
+          document.getElementById("contTypeInput").value = cont_type || '';
+          document.getElementById("conditionInput").value = condition || '';
+          document.getElementById("washingInput").value = washing || '';
+          document.getElementById("gradeDepotInput").value = grade_depot || '';
+          document.getElementById("manufactureInput").value = manufacture || '';
+          document.getElementById("tareInput").value = tare || '';
+          document.getElementById("payloadInput").value = payload || '';
+
+          // Parse Manufacture (e.g. 01/01)
+          if (manufacture && manufacture.includes("/")) {
+            const [mnf_month, mnf_year] = manufacture.split("/");
+            setSelectValue("mnf_month", mnf_month.padStart(2, '0'));
+            if (mnf_year.length === 2) {
+              setSelectValue("mnf_year1", mnf_year[0]);
+              setSelectValue("mnf_year2", mnf_year[1]);
+            }
+          }
+
+          // Parse Tare (e.g. 3901 → 3, 9, 01)
+          if (tare && tare.length >= 4) {
+            setSelectValue("tare1", tare[0]);
+            setSelectValue("tare2", tare[1]);
+            setSelectValue("tare3", tare.slice(2));
+          }
+
+          // Parse Payload (e.g. 28501 → 2, 8, 5, 01)
+          if (payload && payload.length >= 5) {
+            setSelectValue("payload1", payload[0]);
+            setSelectValue("payload2", payload[1]);
+            setSelectValue("payload3", payload[2]);
+            setSelectValue("payload4", payload.slice(3));
+          }
+
+        } else {
+          // Jika QR hanya nomor container, fetch ke server
+          const cont = qrRaw;
+          document.getElementById("scan-result").innerHTML = `<strong>QR Ditemukan:</strong> ${cont}`;
+          document.getElementById("contInput").value = cont;
+
+          fetch(`/get_container_qrcode/?cont=${cont}`)
+            .then(response => {
+              if (!response.ok) throw new Error("Data tidak ditemukan");
+              return response.json();
+            })
+            .then(data => {
+              document.getElementById("customerCodeInput").value = data.customer_code || '';
+              document.getElementById("contSizeInput").value = data.cont_size || '';
+              document.getElementById("contTypeInput").value = data.cont_type || '';
+              document.getElementById("conditionInput").value = data.condition || '';
+              document.getElementById("washingInput").value = data.washing || '';
+              document.getElementById("gradeDepotInput").value = data.grade_depot || '';
+
+              // Manufacture (split)
+              setSelectValue("mnf_month", data.mnf_month);
+              setSelectValue("mnf_year1", data.mnf_year1);
+              setSelectValue("mnf_year2", data.mnf_year2);
+
+              // Tare
+              setSelectValue("tare1", data.tare1);
+              setSelectValue("tare2", data.tare2);
+              setSelectValue("tare3", data.tare3);
+
+              // Payload
+              setSelectValue("payload1", data.payload1);
+              setSelectValue("payload2", data.payload2);
+              setSelectValue("payload3", data.payload3);
+              setSelectValue("payload4", data.payload4);
+            })
+            .catch(error => {
+              alert("Data tidak ditemukan di server.");
+            });
+        }
+      }
     );
   }
 
@@ -456,8 +529,49 @@
     }
   }
 
+  // Helper: Set <select> value safely
+  function setSelectValue(name, value) {
+    const sel = document.querySelector(`select[name="${name}"]`);
+    if (sel) sel.value = value;
+  }
+
   document.getElementById('scanQrModal').addEventListener('shown.bs.modal', startScan);
   document.getElementById('scanQrModal').addEventListener('hidden.bs.modal', stopScan);
+</script>
+
+
+<script>
+function openCamera() {
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const capturedInput = document.getElementById('capturedImageInput');
+
+  video.style.display = 'block';
+
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+      video.srcObject = stream;
+      const track = stream.getVideoTracks()[0];
+
+      video.addEventListener('click', () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+
+        const imageData = canvas.toDataURL('image/png');
+        capturedInput.value = imageData;
+
+        video.pause();
+        track.stop(); // Stop camera
+        video.style.display = 'none';
+        alert("Foto berhasil diambil!");
+      });
+    })
+    .catch(err => {
+      alert("Gagal membuka kamera.");
+    });
+}
+
 </script>
 
 

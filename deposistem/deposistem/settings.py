@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'security',
     'surveyor',
     'tax',
+    'operator_stack',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'surveyor.middleware.ExternalUserMiddleware',
     'home.middleware.ExternalUserMiddleware',
+    'operator_stack.middleware.ExternalUserMiddleware',
 ]
 
 ROOT_URLCONF = 'deposistem.urls'
@@ -71,6 +73,8 @@ TEMPLATES = [
                 'home.context_processors.token_context',
                 'surveyor.context_processors.menu_context',
                 'surveyor.context_processors.token_context',
+                'operator_stack.context_processors.menu_context',
+                'operator_stack.context_processors.token_context',
             ],
         },
     },

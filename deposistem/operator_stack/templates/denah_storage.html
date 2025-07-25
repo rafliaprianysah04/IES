@@ -1,0 +1,92 @@
+{% extends 'base_operator.html' %}
+{% load static %}
+{% load range_tags tz %}
+{% load range_tags %}
+
+{% block title %}Denah Storage{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+  <h3>Storage Area - {{ current_block }}</h3>
+</div>
+
+<div class="page-content">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="get" class="mb-3">
+    <select name="block" class="form-select w-auto d-inline" onchange="this.form.submit()">
+      {% for block in blocks %}
+        <option value="{{ block }}" {% if block == current_block %}selected{% endif %}>Block {{ block }}</option>
+      {% endfor %}
+    </select>
+  </form>
+
+  <form method="post" id="stacking-form">
+    {% csrf_token %}
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <input type="text" name="container_number" id="container_number" class="form-control" placeholder="No. Container" required>
+      </div>
+      <input type="hidden" name="location" id="location_input">
+    </div>
+  </form>
+
+  {% for bay in bay_range %}
+    <h5 class="mt-4 mb-2 fw-bold text-primary">Bay {{ bay }}</h5>
+    <div class="table-responsive" style="font-size: 12px;">
+      <table class="table table-bordered text-center align-middle table-sm" style="min-width: 1000px;">
+        <thead class="table-light">
+          <tr>
+            <th>Tier \ Row</th>
+            {% for row in row_range %}
+              <th>R{{ row }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for tier in tier_range %}
+          <tr>
+            <th class="bg-secondary text-white">T{{ tier }}</th>
+            {% for row in row_range %}
+              {% with key=current_block|add:"_By"|add:bay|stringformat:"s"|add:"_Rw"|add:row|stringformat:"s"|add:"_Tr"|add:tier|stringformat:"s" %}
+                {% with item=storage_map|get:key %}
+                    {% if item and item.cont %}
+                    <td class="bg-success text-white" style="font-size:10px">
+                        {{ item.cont }}<br>
+                        <small>{{ item.stack_at|date:"H:i" }}</small>
+                    </td>
+                    {% else %}
+                    <td class="bg-light" style="cursor:pointer;" onclick="selectLocation('{{ key }}')">-</td>
+                    {% endif %}
+                {% endwith %}
+                {% endwith %}
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endfor %}
+</div>
+
+<script>
+  function selectLocation(locationKey) {
+    const cont = document.getElementById('container_number').value.trim();
+    if (!cont) {
+      alert('Isi nomor container terlebih dahulu.');
+      return;
+    }
+    if (confirm(`Stack container ${cont} ke ${locationKey}?`)) {
+      document.getElementById('location_input').value = locationKey;
+      document.getElementById('stacking-form').submit();
+    }
+  }
+</script>
+{% endblock %}

@@ -314,10 +314,12 @@ def surveyin(request):
                     survey = SurveyInsNew.objects.get(id=survey_id)
 
                     # Simpan tambahan: upload foto, dll
-                    if 'foto' in request.FILES:
-                        survey.foto = request.FILES['foto']
+                    if request.FILES.getlist('foto'):
+                        for uploaded_file in request.FILES.getlist('foto'):
+                            SurveyInsPhoto.objects.create(survey=survey, image=uploaded_file)
 
                     # Generate QR
+
                     qr = qrcode.make(survey.cont)
                     buffer = BytesIO()
                     qr.save(buffer, format='PNG')
@@ -364,9 +366,11 @@ def surveyin(request):
     })
 
 def get_container_qrcode(request):
-    cont = request.GET.get('cont', '').upper()
+    cont = request.GET.get('cont')
     try:
-        survey = SurveyIns.objects.get(cont__iexact=cont)
+        survey = SurveyInsNew.objects.get(cont=cont)
+
+        # Pecah manufacture
         mnf_month, mnf_year1, mnf_year2 = '', '', ''
         if survey.manufacture and '/' in survey.manufacture:
             parts = survey.manufacture.split('/')
@@ -374,17 +378,51 @@ def get_container_qrcode(request):
             if len(parts) > 1 and len(parts[1]) == 2:
                 mnf_year1, mnf_year2 = parts[1][0], parts[1][1]
 
+        # Pecah tare dan payload
+        tare = survey.tare or ''
+        payload = survey.payload or ''
+
         return JsonResponse({
-            'customer_code': survey.customer_code,
-            'cont_size': survey.cont_size,
-            'cont_type': survey.cont_type,
-            'condition': survey.condition,
-            'grade_depot': survey.grade_depot,
-            'manufacture': survey.manufacture,
-            'mnf_month': mnf_month,
-            'mnf_year1': mnf_year1,
-            'mnf_year2': mnf_year2,
-            # Tidak dikirim: washing, haulier_in, truck_no_in, remark
+            "cont_size": survey.cont_size,
+            "cont_type": survey.cont_type,
+            "condition": survey.condition,
+            "washing": survey.washing,
+            "grade_depot": survey.grade_depot,
+
+            "mnf_month": mnf_month,
+            "mnf_year1": mnf_year1,
+            "mnf_year2": mnf_year2,
+
+            "tare1": tare[0] if len(tare) >= 1 else '',
+            "tare2": tare[1] if len(tare) >= 2 else '',
+            "tare3": tare[2:] if len(tare) >= 3 else '',
+
+            "payload1": payload[0] if len(payload) >= 1 else '',
+            "payload2": payload[1] if len(payload) >= 2 else '',
+            "payload3": payload[2] if len(payload) >= 3 else '',
+            "payload4": payload[3:] if len(payload) >= 4 else '',
         })
-    except SurveyIns.DoesNotExist:
-        return JsonResponse({'error': 'Data tidak ditemukan'}, status=404)
+    except SurveyInsNew.DoesNotExist:
+        return JsonResponse({}, status=404)
+
+    
+
+def list_surveyin1(request):
+    return render(request, 'surveyin/list_surveyin.html')
+
+def list_surveyin(request):
+    surveys = SurveyInsNew.objects.all()  # Bisa ditambahkan filter untuk pencarian, contoh: .filter(cont__icontains="ABC")
+    # Kirim data ke template
+    return render(request, 'surveyin/list_surveyin.html', {'surveys': surveys})
+
+def view_surveyin(request,id):
+     # Ambil satu data survey berdasarkan id
+    surveyins = get_object_or_404(SurveyInsNew, id=id)
+
+    # Ambil semua foto yang berelasi dengan container ini
+    photos = SurveyInsPhoto.objects.filter(survey=surveyins).order_by('-uploaded_at')
+
+    return render(request, 'surveyin/view_surveyin.html', {
+        'surveyins': surveyins,
+        'photos': photos,
+    })

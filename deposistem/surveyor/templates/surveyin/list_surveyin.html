@@ -1,0 +1,79 @@
+{% extends 'base_surveyor.html' %}
+{% load static %}
+
+{% block title %}Data Survey In{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h4 class="mb-4 text-center">Data Survey In</h4>
+
+  <!-- Form Pencarian -->
+  <form class="row g-3 mb-4" action="#" method="get">
+    <div class="col-md-4">
+      <label class="form-label">Container / Status</label>
+      <input type="text" class="form-control" name="cont" placeholder="Container / Status" value="{{ request.GET.cont }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Date From</label>
+      <input type="date" class="form-control" name="date_from" value="{{ request.GET.date_from }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Date To</label>
+      <input type="date" class="form-control" name="date_to" value="{{ request.GET.date_to }}">
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+      <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+  </form>
+
+  <!-- Tabel Data -->
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped table-sm align-middle text-nowrap">
+      <thead class="table-light text-center">
+      <tr>
+        <th>No</th><th>Action</th>
+        <th>Container</th>
+        <th>Cust</th>
+        <th>Date</th>
+        
+        <th>Grade</th>
+       
+        <th>Truck No</th>
+        <th>Status</th>
+        <th>Photo</th>
+        <th>EiR</th>
+        
+      </tr>
+    </thead>
+    <tbody>
+      {% for surveyinsnew in surveys %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>
+          <a href="#">[Upld]</a> |
+          <a href="{% url 'surveyor:view_surveyin' surveyinsnew.id %}?token={{token}}">[View]</a>
+        </td>
+        <td>{{ surveyinsnew.cont }}</td>
+        <td>{{ surveyinsnew.customer_code }}</td>
+        <td>{{ surveyinsnew.created_at|date:"Y-m-d H:i:s" }}</td>
+        <!--<td>
+          {% if surveyins.photo %}
+            <img src="{{ survey.photo.url }}" alt="Photo" width="100">
+          {% else %}
+            No Photo
+          {% endif %} 
+        </td> -->
+        <td>{{ surveyinsnew.grade_depot }} - {{ surveyinsnew.grade_msl }}</td>
+       
+        <td>{{ surveyinsnew.truck_no_in }}</td>
+        <td>{{ surveyinsnew.status }}</td>
+        <td>{{ surveyinsnew.photo_status }}</td>
+        <td>{{ surveyinsnew.eir_status }}</td>
+        
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</figure>
+
+{% endblock %}

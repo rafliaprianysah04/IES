@@ -22,10 +22,10 @@ def home(request):
             'name': 'Operator',
             'icon': 'fa-wifi',
             'color': '#2980b9',
-            'url': '/presence/',
+            'url': reverse('operator_stack:dashboard_operator') + f'?token={token}',
         },
         {
-            'name': 'Customer',
+            'name': 'Customer Service',
             'icon': 'fa-users',
             'color': '#e67e22',
             'url': '/hris/',

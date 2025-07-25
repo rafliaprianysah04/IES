@@ -24,4 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/', include('home.urls', namespace='home')),
     path('surveyor/', include('surveyor.urls', namespace='surveyor')),
+    path('operator/', include('operator_stack.urls', namespace='operator_stack')),
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,46 @@
+{% extends 'base_operator.html' %}
+{% load static %}
+{% load range_tags %}
+
+{% block title %}Denah Storage{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+  <h3>Storage Area - Block A</h3>
+</div>
+
+<div class="page-content">
+  <section class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered text-center align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th rowspan="2">Bays\Rows</th>
+                  {% for row in 1|make_list:8 %}
+                    <th colspan="1">Row {{ row }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for tier in 1|make_list:8 %}
+                <tr>
+                  {% if forloop.first %}
+                    <td class="fw-bold bg-secondary text-white" rowspan="8" style="writing-mode: vertical-rl; transform: rotate(180deg);">Bay 1</td>
+                  {% endif %}
+                  {% for row in 1|make_list:8 %}
+                  <td class="bg-success text-white">Tier {{ tier }}</td>
+                  {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
